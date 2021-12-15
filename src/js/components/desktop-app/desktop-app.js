@@ -12,6 +12,7 @@ template.innerHTML = `
     }
 
     #desktop {
+      position: relative;
       background-color: green;
       height: 100%;
     }
@@ -23,10 +24,17 @@ template.innerHTML = `
       left: 0;
       width: 100%;
       height: 8em;
+      z-index: 100;
+    }
+
+    app-window:focus {
+      outline: none;
+      z-index: 10;
     }
   </style>
   <div id="desktop">
-    <app-window></app-window>
+    <app-window tabindex="1"></app-window>
+    <app-window tabindex="2"></app-window>
   </div>
   <div id="icon-bar"></div>
 `
@@ -46,5 +54,10 @@ customElements.define('desktop-app',
 
       this.attachShadow({ mode: 'open' })
         .appendChild(template.content.cloneNode(true))
+
+      this.addEventListener('app-window-focused', event => {
+        event.stopPropagation()
+        event.target.focus()
+      })
     }
   })

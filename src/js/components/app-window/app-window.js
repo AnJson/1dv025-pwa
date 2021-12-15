@@ -34,14 +34,60 @@ customElements.define('app-window',
    *
    */
   class extends HTMLElement {
+    /**
+     * The dragging-state of the element.
+     *
+     * @type {boolean}
+     */
     #active = false
+
+    /**
+     * The elements current position on x-axis.
+     *
+     * @type {number}
+     */
     #currentX
+
+    /**
+     * The elements current position on y-axis.
+     *
+     * @type {number}
+     */
     #currentY
+
+    /**
+     * The starting-point to calculate the drag from(the position of cursor when clicking, on x-axis).
+     *
+     * @type {number}
+     */
     #initialX
+
+    /**
+     * The starting-point to calculate the drag from(the position of cursor when clicking, on y-axis).
+     *
+     * @type {number}
+     */
     #initialY
+
+    /**
+     * The offset(distance) from 0 on x-axis.
+     *
+     * @type {number}
+     */
     #xOffset = 0
+
+    /**
+     * The offset(distance) from 0 on y-axis.
+     *
+     * @type {number}
+     */
     #yOffset = 0
 
+    /**
+     * The div header div-element.
+     *
+     * @type {HTMLElement}
+     */
     #header
 
     /**
@@ -62,7 +108,7 @@ customElements.define('app-window',
       })
 
       this.#header.addEventListener('mousedown', (event) => {
-        this.#dragStart(event)
+        this.#dragStart(event.clientX, event.clientY)
       })
 
       this.#header.addEventListener('mouseup', (event) => {
@@ -72,7 +118,7 @@ customElements.define('app-window',
 
       this.#header.addEventListener('mousemove', (event) => {
         event.stopPropagation()
-        this.#drag(event)
+        this.#drag(event.clientX, event.clientY)
       })
     }
 
@@ -81,13 +127,23 @@ customElements.define('app-window',
     // https://www.kirupa.com/html5/drag.htm
     // ------------------------------------------------
 
-    #dragStart (event) {
-      this.#initialX = event.clientX - this.#xOffset
-      this.#initialY = event.clientY - this.#yOffset
+    /**
+     * Initialize the dragging-process.
+     *
+     * @param {number} x - The position of the cursor on x-axis.
+     * @param {number} y - The position of the cursor on y-axis.
+     */
+    #dragStart (x, y) {
+      this.#initialX = x - this.#xOffset
+      this.#initialY = y - this.#yOffset
 
       this.#active = true
     }
 
+    /**
+     * Stop the dragging-process.
+     *
+     */
     #dragEnd () {
       this.#initialX = this.#currentX
       this.#initialY = this.#currentY
@@ -95,10 +151,16 @@ customElements.define('app-window',
       this.#active = false
     }
 
-    #drag (event) {
+    /**
+     * Set up the re-position the element based on cursor-position.
+     *
+     * @param {number} x - The position of the cursor on x-axis.
+     * @param {number} y - The position of the cursor on y-axis.
+     */
+    #drag (x, y) {
       if (this.#active) {
-        this.#currentX = event.clientX - this.#initialX
-        this.#currentY = event.clientY - this.#initialY
+        this.#currentX = x - this.#initialX
+        this.#currentY = y - this.#initialY
         this.#xOffset = this.#currentX
         this.#yOffset = this.#currentY
 
@@ -106,7 +168,13 @@ customElements.define('app-window',
       }
     }
 
-    #setPosition(xPos, yPos) {
+    /**
+     * Re-position the element based on cursor-position.
+     *
+     * @param {number} xPos - The position of the cursor on x-axis.
+     * @param {number} yPos - The position of the cursor on y-axis.
+     */
+    #setPosition (xPos, yPos) {
       this.style.left = `${xPos}px`
       this.style.top = `${yPos}px`
     }

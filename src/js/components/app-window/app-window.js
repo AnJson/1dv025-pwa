@@ -1,37 +1,32 @@
-import '../app-window/'
-
 const template = document.createElement('template')
 
 template.innerHTML = `
   <style>
     :host {
       position: relative;
-      display: block;
-      height: 100vh;
+      display: flex;
+      flex-direction: column;
       font-size: 10px;
+      height: 60vh;
+      max-width: 80em; 
+      min-height: 60em;
     }
 
-    #desktop {
-      background-color: green;
+    #header {
+      height: 3em;
+      background-color: red;
+    }
+
+    #content {
       height: 100%;
-    }
-
-    #icon-bar {
-      background-color: blue;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 8em;
+      background-color: yellow;
     }
   </style>
-  <div id="desktop">
-    <app-window></app-window>
-  </div>
-  <div id="icon-bar"></div>
+  <div id="header"></div>
+  <div id="content"></div>
 `
 
-customElements.define('desktop-app',
+customElements.define('app-window',
   /**
    * Class to define custom element.
    *

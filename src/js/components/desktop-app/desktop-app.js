@@ -80,8 +80,25 @@ customElements.define('desktop-app',
    *
    */
   class extends HTMLElement {
+    /**
+     * The position on x-axis to open next app-window on.
+     *
+     * @type {number}
+     */
     #nextWindowX = 20
+
+    /**
+     * The position on y-axis to open next app-window on.
+     *
+     * @type {number}
+     */
     #nextWindowY = 20
+
+    /**
+     * The div-element acting as the desktop where windows are opened.
+     *
+     * @type {HTMLElement}
+     */
     #desktopElement
 
     /**

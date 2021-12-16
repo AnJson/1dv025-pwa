@@ -2,3 +2,11 @@ body {
 	margin: 0;
 	overflow: hidden;
 }
+
+.dark-mode {
+	--color-header-inactive-text: rgba(6, 5, 16, 0.6);
+	--color-header-inactive-background: rgba(30, 30, 31, 0.95);
+	--color-header-active-background: rgba(30, 30, 31, 1);
+	--color-highlight: rgba(221, 52, 33, 0.9);
+	--color-header-text: rgb(229, 231, 237);
+}

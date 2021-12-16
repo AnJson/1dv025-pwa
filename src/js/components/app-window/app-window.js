@@ -4,27 +4,80 @@ template.innerHTML = `
   <style>
     :host {
       position: absolute;
-      left: 0;
-      top: 0;
       display: flex;
       flex-direction: column;
       font-size: 10px;
       height: 60vh;
       width: 80em; 
       min-height: 60em;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
+      border-radius: 3px;
+      overflow: hidden;
     }
 
     #header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       height: 5em;
-      background-color: red;
+      background-color: var(--color-header-inactive-background);
+      box-sizing: border-box;
+      padding: 0 1em;
+      color: var(--color-header-text);
+      transition: all 300ms;
+    }
+
+    #header:hover {
+      background-color: var(--color-header-active-background);
     }
 
     #content {
       height: 100%;
       background-color: yellow;
     }
+
+    #close {
+      position: relative;
+      display: block;
+      width: 2em;
+      height: 2em;
+      top: 6px;
+      margin-left: auto;
+      cursor: pointer;
+      color: var(--color-header-inactive-text);
+      transition: all 200ms;
+    }
+
+    #close:hover {
+      color: var(--color-highlight);
+    }
+
+    #close::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 3px;
+      width: 100%;
+      transform: rotate(45deg);
+      background-color: currentColor;
+    }
+
+    #close::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 3px;
+      width: 100%;
+      transform: rotate(-45deg);
+      background-color: currentColor;
+    }
   </style>
-  <div id="header"></div>
+  <div id="header">
+    <p>Title</p>
+    <span id="close"></span>
+  </div>
   <div id="content"></div>
 `
 
@@ -74,14 +127,14 @@ customElements.define('app-window',
      *
      * @type {number}
      */
-    #xOffset = 0
+    #xOffset
 
     /**
      * The offset(distance) from 0 on y-axis.
      *
      * @type {number}
      */
-    #yOffset = 0
+    #yOffset
 
     /**
      * The div header div-element.
@@ -89,6 +142,13 @@ customElements.define('app-window',
      * @type {HTMLElement}
      */
     #header
+
+    /**
+     * The span-element to close the window.
+     *
+     * @type {HTMLElement}
+     */
+    #closeWindow
 
     /**
      * Create instance of class and attach open shadow-dom.
@@ -101,6 +161,14 @@ customElements.define('app-window',
         .appendChild(template.content.cloneNode(true))
 
       this.#header = this.shadowRoot.querySelector('#header')
+      this.#closeWindow = this.shadowRoot.querySelector('#close')
+
+      this.#closeWindow.addEventListener('click', event => {
+        event.stopPropagation()
+        this.dispatchEvent(new CustomEvent('close-window', {
+          bubbles: true
+        }))
+      })
 
       this.addEventListener('mousedown', (event) => {
         event.stopPropagation()
@@ -120,6 +188,39 @@ customElements.define('app-window',
         event.stopPropagation()
         this.#drag(event.clientX, event.clientY)
       })
+    }
+
+    /**
+     * Set x & y position to element if not already set.
+     * Set tabindex if not set.
+     *
+     */
+    connectedCallback () {
+      if (!this.#xOffset || !this.#yOffset) {
+        this.positionWindow()
+      }
+
+      if (!this.hasAttribute('tabindex')) {
+        this.setAttribute('tabindex', 0)
+      }
+    }
+
+    /**
+     * Position window absolute with x and y coordinates.
+     *
+     * @param {number} [x=500] - Offset in px from the left on x-axis.
+     * @param {number} [y=200] - Offset in px from the left on x-axis.
+     */
+    positionWindow (x = 10, y = 20) {
+      if ((typeof x !== 'number' || !Number.isInteger(x)) || (typeof y !== 'number' || !Number.isInteger(y))) {
+        x = 500
+        y = 200
+      }
+
+      this.#xOffset = x
+      this.#yOffset = y
+      this.style.left = `${x}px`
+      this.style.top = `${y}px`
     }
 
     // ------------------------------------------------
@@ -145,6 +246,22 @@ customElements.define('app-window',
      *
      */
     #dragEnd () {
+      const rect = this.getBoundingClientRect()
+      // Check if window is off-screen to the left or right and if so, push it back in on screen.
+      if (rect.x < 0) {
+        rect.x = 0
+        this.#currentX = 0
+        this.#xOffset = this.#currentX
+        this.#yOffset = this.#currentY
+        this.#setPosition(this.#currentX, this.#currentY)
+      } else if (rect.x + rect.width > window.innerWidth) {
+        rect.x = window.innerWidth - rect.width
+        this.#currentX = window.innerWidth - rect.width
+        this.#xOffset = this.#currentX
+        this.#yOffset = this.#currentY
+        this.#setPosition(this.#currentX, this.#currentY)
+      }
+
       this.#initialX = this.#currentX
       this.#initialY = this.#currentY
 

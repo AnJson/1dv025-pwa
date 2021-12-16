@@ -1,3 +1,5 @@
+import '../my-loader/'
+
 const template = document.createElement('template')
 
 template.innerHTML = `
@@ -13,6 +15,16 @@ template.innerHTML = `
       box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
       border-radius: 3px;
       overflow: hidden;
+    }
+
+    ::slotted(*) {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    slot {
+      width: 100%;
+      height: 100%;
     }
 
     #header {
@@ -33,7 +45,7 @@ template.innerHTML = `
 
     #content {
       height: 100%;
-      background-color: yellow;
+      background-color: var(--color-header-inactive-background);
     }
 
     #close {
@@ -78,7 +90,7 @@ template.innerHTML = `
     <p>Title</p>
     <span id="close"></span>
   </div>
-  <div id="content"></div>
+  <div id="content"><slot><my-loader></my-loader></slot></div>
 `
 
 customElements.define('app-window',

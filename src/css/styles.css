@@ -4,9 +4,11 @@ body {
 }
 
 .dark-mode {
-	--color-header-inactive-text: rgba(6, 5, 16, 0.6);
+	--color-header-inactive-text: rgb(62, 62, 63);
 	--color-header-inactive-background: rgba(30, 30, 31, 0.95);
-	--color-header-active-background: rgba(30, 30, 31, 1);
-	--color-highlight: rgba(221, 52, 33, 0.9);
+	--color-header-active-background: rgb(22, 22, 28);
+	--color-highlight: rgba(181, 40, 24, 0.9);
 	--color-header-text: rgb(229, 231, 237);
+	--color-extra-light: rgba(107, 16, 6, 0.9);
+	--color-extra-dark: rgba(73, 17, 11, 0.9);
 }

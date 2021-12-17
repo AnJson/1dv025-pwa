@@ -1,5 +1,6 @@
 import '../app-window/'
 import '../app-icon/'
+import * as constants from './lib/constants.js'
 
 const template = document.createElement('template')
 
@@ -124,38 +125,64 @@ customElements.define('desktop-app',
         this.#nextWindowY -= 20
       })
 
-      this.shadowRoot.addEventListener('icon-clicked', event => {
+      this.shadowRoot.addEventListener('icon-clicked', async event => {
         event.stopPropagation()
 
         if (event.detail.element) {
-          this.#openAppWindow()
-          // TODO: Implement this function.
-          // this.#placeAppInWindow(event.detail.element)
+          const appWindow = this.#createAppWindow()
+          this.#desktopElement.appendChild(appWindow)
+          const app = await this.#createCustomElement(event.detail.element)
+          // If app was created successfully.
+          if (app) {
+            appWindow.appendChild(app)
+          }
         }
       })
     }
 
     /**
-     * Create, position and append app-window to desktop-div.
+     * Create and set position for app-window.
      *
+     * @returns {HTMLElement} - Custom app-window element.
      */
-    #openAppWindow () {
+    #createAppWindow () {
       const appWindow = document.createElement('app-window')
       appWindow.positionWindow(this.#nextWindowX, this.#nextWindowY)
-      this.#desktopElement.appendChild(appWindow)
       this.#nextWindowX += 20
       this.#nextWindowY += 20
+
+      return appWindow
     }
 
     /**
-     * Create and append app to app-window.
+     * Create new element.
      *
+     * @param {string} elementName - Tag-name for element to create.
+     * @returns {HTMLElement} - Element created based on parameter.
      */
-    #placeAppInWindow () {
-      const appWindow = document.createElement('app-window')
-      appWindow.positionWindow(this.#nextWindowX, this.#nextWindowY)
-      this.#desktopElement.appendChild(appWindow)
-      this.#nextWindowX += 20
-      this.#nextWindowY += 20
+    async #createCustomElement (elementName) {
+      if (typeof elementName !== 'string') {
+        return
+      }
+
+      // Lazy-load application by trying to import it, if import fails show error-message.
+      try {
+        await import(/* @vite-ignore */`../${elementName}/`)
+      } catch {
+        this.#showWarning(constants.ERROR_IMPORT)
+        return
+      }
+
+      return document.createElement(elementName)
+    }
+
+    /**
+     * Show error-banner with message for a short time.
+     *
+     * @param {string} text - Text to display in error-list.
+     */
+    #showWarning (text) {
+      // TODO: Create banner to place at the top to display error-message.
+      console.log(text)
     }
   })

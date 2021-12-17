@@ -258,22 +258,6 @@ customElements.define('app-window',
      *
      */
     #dragEnd () {
-      const rect = this.getBoundingClientRect()
-      // Check if window is off-screen to the left or right and if so, push it back in on screen.
-      if (rect.x < 0) {
-        rect.x = 0
-        this.#currentX = 0
-        this.#xOffset = this.#currentX
-        this.#yOffset = this.#currentY
-        this.#setPosition(this.#currentX, this.#currentY)
-      } else if (rect.x + rect.width > window.innerWidth) {
-        rect.x = window.innerWidth - rect.width
-        this.#currentX = window.innerWidth - rect.width
-        this.#xOffset = this.#currentX
-        this.#yOffset = this.#currentY
-        this.#setPosition(this.#currentX, this.#currentY)
-      }
-
       this.#initialX = this.#currentX
       this.#initialY = this.#currentY
 

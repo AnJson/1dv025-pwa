@@ -169,7 +169,7 @@ customElements.define('desktop-app',
       try {
         await import(/* @vite-ignore */`../${elementName}/`)
       } catch {
-        this.#showWarning(constants.ERROR_IMPORT)
+        await this.#showWarning(constants.ERROR_IMPORT)
         return
       }
 
@@ -181,8 +181,18 @@ customElements.define('desktop-app',
      *
      * @param {string} text - Text to display in error-list.
      */
-    #showWarning (text) {
-      // TODO: Create banner to place at the top to display error-message.
-      console.log(text)
+    async #showWarning (text) {
+      try {
+        await import(/* @vite-ignore */'../error-banner/')
+        const banner = document.createElement('error-banner')
+        banner.setAttribute('data-message', text)
+        this.#desktopElement.appendChild(banner)
+
+        setTimeout(() => {
+          this.#desktopElement.removeChild(banner)
+        }, 4000)
+      } catch (error) {
+        console.log(error)
+      }
     }
   })

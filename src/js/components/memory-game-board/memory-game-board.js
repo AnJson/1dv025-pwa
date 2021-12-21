@@ -169,10 +169,8 @@ customElements.define('memory-game-board',
       })
 
       this.#backButtonElement.addEventListener('click', event => {
-        event.preventDefault()
-        this.dispatchEvent(new CustomEvent('reset-game', {
-          bubbles: true
-        }))
+        event.stopPropagation()
+        this.dispatchEvent(new CustomEvent('back-button-clicked'))
       })
     }
 
@@ -363,7 +361,7 @@ customElements.define('memory-game-board',
         this.#matchedCards += 2
 
         if (this.#matchedCards === this.#cardsOnBoard) {
-          this.dispatchEvent(new CustomEvent('game-over'))
+          this.dispatchEvent(new CustomEvent('all-cards-matched'))
           this.#matchedCards = 0
         }
       } else {

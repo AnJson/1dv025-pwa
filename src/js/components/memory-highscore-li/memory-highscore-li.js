@@ -75,8 +75,8 @@ customElements.define('memory-highscore-li',
      * Callback-function triggered when observed attribute has been manipulated.
      *
      * @param {string} name - Name of the attribute.
-     * @param {*} oldVal - Value before change.
-     * @param {*} newVal - Value after change.
+     * @param {string} oldVal - Value before change.
+     * @param {string} newVal - Value after change.
      */
     attributeChangedCallback (name, oldVal, newVal) {
       if (oldVal !== newVal) {

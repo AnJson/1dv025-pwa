@@ -126,9 +126,7 @@ customElements.define('memory-highscore',
       this.#restartButton = this.shadowRoot.querySelector('#restart-button')
 
       this.#restartButton.addEventListener('click', () => {
-        this.dispatchEvent(new CustomEvent('reset-game', {
-          bubbles: true
-        }))
+        this.dispatchEvent(new CustomEvent('restart-button-clicked'))
       })
     }
 

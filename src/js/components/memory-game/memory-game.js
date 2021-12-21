@@ -160,16 +160,20 @@ customElements.define('memory-game',
         this.#gameBoardElement.setAttribute('data-level', event.detail.level)
       })
 
-      this.#memoryStartElement.addEventListener('start-game', event => {
+      this.#memoryStartElement.addEventListener('nickname-button-clicked', event => {
         this.#nickname = event.detail.nickname
         this.#startGameHandler()
       })
 
-      this.shadowRoot.addEventListener('reset-game', () => {
-        this.#resetGameHandler()
+      this.#highscoreElement.addEventListener('restart-button-clicked', () => {
+        this.#restartGame()
       })
 
-      this.#gameBoardElement.addEventListener('game-over', () => {
+      this.#gameBoardElement.addEventListener('back-button-clicked', () => {
+        this.#restartGame()
+      })
+
+      this.#gameBoardElement.addEventListener('all-cards-matched', () => {
         this.#gameOverHandler()
       })
 
@@ -196,7 +200,7 @@ customElements.define('memory-game',
      * Show start-screen and stop clock.
      *
      */
-    #resetGameHandler () {
+    #restartGame () {
       this.#memoryClockElement.removeAttribute('running')
       this.#hideAllSectionsInContainer(this.#mainElement)
       this.#hideAllSectionsInContainer(this.#headerElement)

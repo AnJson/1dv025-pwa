@@ -182,21 +182,21 @@ customElements.define('app-window',
         }))
       })
 
-      this.addEventListener('mousedown', (event) => {
+      this.addEventListener('mousedown', event => {
         event.stopPropagation()
         this.dispatchEvent(new CustomEvent('app-window-focused'))
       })
 
-      this.#header.addEventListener('mousedown', (event) => {
+      this.#header.addEventListener('mousedown', event => {
         this.#dragStart(event.clientX, event.clientY)
       })
 
-      this.#header.addEventListener('mouseup', (event) => {
+      this.#header.addEventListener('mouseup', event => {
         event.stopPropagation()
         this.#dragEnd()
       })
 
-      this.#header.addEventListener('mousemove', (event) => {
+      this.#header.addEventListener('mousemove', event => {
         event.stopPropagation()
         this.#drag(event.clientX, event.clientY)
       })

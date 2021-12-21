@@ -191,7 +191,7 @@ customElements.define('memory-start',
 
       this.#startFormElement.addEventListener('submit', event => {
         event.preventDefault()
-        this.dispatchEvent(new CustomEvent('start-game', {
+        this.dispatchEvent(new CustomEvent('nickname-button-clicked', {
           detail: {
             nickname: this.#nicknameInputElement.value
           }

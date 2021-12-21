@@ -23,7 +23,6 @@ template.innerHTML = `
     }
 
     #icon-bar {
-      background-color: blue;
       position: absolute;
       bottom: 0;
       left: 0;
@@ -35,6 +34,10 @@ template.innerHTML = `
       box-sizing: border-box;
       padding: 0 2em;
       z-index: 100;
+    }
+
+    #icon-bar:hover #icon-container > * {
+      transform: scale(1.2) translateY(-1em);
     }
 
     #icon-container {
@@ -53,6 +56,10 @@ template.innerHTML = `
     .icon {
       font-size: 2em;
       cursor: pointer;
+    }
+
+    app-icon {
+      transition: all 300ms;
     }
 
     app-window:focus {

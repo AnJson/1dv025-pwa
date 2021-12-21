@@ -32,20 +32,20 @@ template.innerHTML = `
       align-items: center;
       justify-content: center;
       height: 5em;
-      background-color: var(--color-header-inactive-background);
+      background-color: var(--color-inactive-background);
       box-sizing: border-box;
       padding: 0 1em;
-      color: var(--color-header-text);
+      color: var(--color-text);
       transition: all 300ms;
     }
 
     #header:hover {
-      background-color: var(--color-header-active-background);
+      background-color: var(--color-active-background);
     }
 
     #content {
       height: 100%;
-      background-color: var(--color-header-inactive-background);
+      background-color: var(--color-inactive-background);
     }
 
     #close {
@@ -53,10 +53,10 @@ template.innerHTML = `
       display: block;
       width: 2em;
       height: 2em;
-      top: 6px;
+      top: 8px;
       margin-left: auto;
       cursor: pointer;
-      color: var(--color-header-inactive-text);
+      color: var(--color-inactive-text);
       transition: all 200ms;
     }
 

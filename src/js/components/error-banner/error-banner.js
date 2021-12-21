@@ -17,7 +17,7 @@ template.innerHTML = `
       background-color: var(--color-extra-light);
       box-sizing: border-box;
       z-index: 1000;
-      color: var(--color-header-text);
+      color: var(--color-text);
       transition: all 300ms;
     }
 

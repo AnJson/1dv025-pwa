@@ -38,7 +38,7 @@ customElements.define('app-icon',
      * @type {HTMLElement}
      */
     // TODO: remove default value.
-    #targetElement = 'memory-app'
+    #targetElement = 'memory-game'
 
     /**
      * Create instance of class and attach open shadow-dom.

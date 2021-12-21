@@ -1,5 +1,6 @@
 import '../app-window/'
 import '../app-icon/'
+import svgUrl from './lib/symbol-defs.svg'
 import * as constants from './lib/constants.js'
 
 const template = document.createElement('template')
@@ -30,13 +31,13 @@ template.innerHTML = `
       justify-content: center;
       align-items: center;
       width: 100%;
-      height: 7em;
       box-sizing: border-box;
-      padding: 0 2em;
+      padding: .5em 2em;
+      background-color: var(--color-inactive-background);
       z-index: 100;
     }
 
-    #icon-bar:hover #icon-container > * {
+    #icon-container:hover > * {
       transform: scale(1.2) translateY(-1em);
     }
 
@@ -66,6 +67,31 @@ template.innerHTML = `
       outline: none;
       z-index: 10;
     }
+
+    #theme-mode {
+      cursor: pointer;
+    }
+
+    #full-screen {
+      cursor: pointer;
+      font-size: 10px;
+      color: var(--color-inactive-text);
+    }
+
+    #full-screen:hover {
+      color: var(--color-text);
+    }
+
+    .full-screen-icon {
+      width: 2.5em;
+      height: 2.5em;
+      fill: currentColor;
+      transition: all 200ms;
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
   <div id="desktop"></div>
   <div id="icon-bar">
@@ -75,8 +101,15 @@ template.innerHTML = `
       <app-icon></app-icon>
     </div>
     <div id="info-bar">
-      <div>Dark/Light</div>
-      <div>FullScreen</div>
+      <div id="theme-mode">Dark/Light</div>
+      <div id="full-screen">
+        <svg class="full-screen-icon">
+          <use href="${svgUrl}#icon-enlarge" />
+        </svg>
+        <svg class="full-screen-icon hidden">
+          <use href="${svgUrl}#icon-shrink" />
+        </svg>
+      </div>
       <div>Clock</div>
     </div>
   </div>
@@ -110,6 +143,20 @@ customElements.define('desktop-app',
     #desktopElement
 
     /**
+     * The div-element holding the full-screen svg-icons.
+     *
+     * @type {HTMLElement}
+     */
+    #fullScreenToggleElement
+
+    /**
+     * The div-element holding the theme-mode svg-icons.
+     *
+     * @type {HTMLElement}
+     */
+    #themeToggleElement
+
+    /**
      * Create instance of class and attach open shadow-dom.
      *
      */
@@ -120,6 +167,18 @@ customElements.define('desktop-app',
         .appendChild(template.content.cloneNode(true))
 
       this.#desktopElement = this.shadowRoot.querySelector('#desktop')
+      this.#fullScreenToggleElement = this.shadowRoot.querySelector('#full-screen')
+      this.#themeToggleElement = this.shadowRoot.querySelector('#theme-mode')
+
+      /* this.#fullScreenToggleElement.addEventListener('click', event => {
+        event.stopPropagation()
+        this.#toggleFullScreen()
+      }) */
+
+      this.#fullScreenToggleElement.addEventListener('click', event => {
+        event.stopPropagation()
+        this.#toggleFullScreen()
+      })
 
       this.addEventListener('app-window-focused', event => {
         event.target.focus()
@@ -143,6 +202,12 @@ customElements.define('desktop-app',
           if (app) {
             appWindow.appendChild(app)
           }
+        }
+      })
+
+      this.addEventListener('fullscreenchange', () => {
+        for (const svg of this.#fullScreenToggleElement.children) {
+          svg.classList.toggle('hidden')
         }
       })
     }
@@ -181,6 +246,18 @@ customElements.define('desktop-app',
       }
 
       return document.createElement(elementName)
+    }
+
+    /**
+     * Toggle app-view in full-screen.
+     *
+     */
+    #toggleFullScreen () {
+      if (!document.fullscreenElement) {
+        this.requestFullscreen()
+      } else {
+        document.exitFullscreen()
+      }
     }
 
     /**

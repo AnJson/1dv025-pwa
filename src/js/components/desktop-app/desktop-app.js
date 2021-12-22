@@ -119,8 +119,8 @@ template.innerHTML = `
     <div id="desktop"></div>
     <div id="icon-bar">
       <div id="icon-container">
-        <app-icon></app-icon>
-        <app-icon></app-icon>
+        <app-icon data-target="memory-game"></app-icon>
+        <app-icon data-target="local-weather"></app-icon>
         <app-icon></app-icon>
       </div>
       <div id="info-bar">

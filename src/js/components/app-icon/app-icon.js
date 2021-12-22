@@ -33,12 +33,11 @@ customElements.define('app-icon',
    */
   class extends HTMLElement {
     /**
-     * The element to open on click.
+     * The tag-name of the element to open on click.
      *
-     * @type {HTMLElement}
+     * @type {string}
      */
-    // TODO: remove default value.
-    #targetElement = 'memory-game'
+    #targetElement
 
     /**
      * Create instance of class and attach open shadow-dom.
@@ -58,5 +57,31 @@ customElements.define('app-icon',
           }
         }))
       })
+    }
+
+    /**
+     * Attribute-names to observe and react on.
+     *
+     * @readonly
+     * @static
+     * @returns {string[]} - Array of attribute-names.
+     */
+    static get observedAttributes () {
+      return ['data-target']
+    }
+
+    /**
+     * React on attribute-changed.
+     *
+     * @param {string} name - Name of attribute.
+     * @param {string} oldVal - Attribute-value before change.
+     * @param {string} newVal - Attribute-value after change.
+     */
+    attributeChangedCallback (name, oldVal, newVal) {
+      if (oldVal !== newVal) {
+        if (name === 'data-target') {
+          this.#targetElement = newVal
+        }
+      }
     }
   })

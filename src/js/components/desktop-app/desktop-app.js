@@ -8,13 +8,35 @@ const template = document.createElement('template')
 template.innerHTML = `
   <style>
     :host {
+      display: block;
+    }
+
+    #app {
       position: relative;
       display: flex;
       flex-direction: column;
       width: 100%;
       height: 100vh;
       font-size: 10px;
+      --color-inactive-text: rgb(62, 62, 63);
+      --color-inactive-background: rgba(250, 248, 243, 0.97);
+      --color-active-background: rgb(255, 250, 247);
+      --color-highlight: rgba(181, 40, 24, 0.9);
+      --color-text: rgb(22, 22, 28);
+      --color-extra-light: rgba(107, 16, 6, 0.9);
+      --color-extra-dark: rgba(73, 17, 11, 0.9);
     }
+
+    #app.dark-mode {
+      --color-inactive-text: rgb(62, 62, 63);
+      --color-inactive-background: rgba(30, 30, 31, 0.98);
+      --color-active-background: rgb(22, 22, 28);
+      --color-highlight: rgba(181, 40, 24, 0.9);
+      --color-text: rgb(229, 231, 237);
+      --color-extra-light: rgba(107, 16, 6, 0.9);
+      --color-extra-dark: rgba(73, 17, 11, 0.9);
+    }
+ 
 
     #desktop {
       flex: 1;
@@ -93,24 +115,26 @@ template.innerHTML = `
       display: none !important;
     }
   </style>
-  <div id="desktop"></div>
-  <div id="icon-bar">
-    <div id="icon-container">
-      <app-icon></app-icon>
-      <app-icon></app-icon>
-      <app-icon></app-icon>
-    </div>
-    <div id="info-bar">
-      <div id="theme-mode">Dark/Light</div>
-      <div id="full-screen">
-        <svg class="full-screen-icon">
-          <use href="${svgUrl}#icon-enlarge" />
-        </svg>
-        <svg class="full-screen-icon hidden">
-          <use href="${svgUrl}#icon-shrink" />
-        </svg>
+  <div id="app" class="dark-mode">
+    <div id="desktop"></div>
+    <div id="icon-bar">
+      <div id="icon-container">
+        <app-icon></app-icon>
+        <app-icon></app-icon>
+        <app-icon></app-icon>
       </div>
-      <div>Clock</div>
+      <div id="info-bar">
+        <div id="theme-mode">Dark/Light</div>
+        <div id="full-screen">
+          <svg class="full-screen-icon">
+            <use href="${svgUrl}#icon-enlarge" />
+          </svg>
+          <svg class="full-screen-icon hidden">
+            <use href="${svgUrl}#icon-shrink" />
+          </svg>
+        </div>
+        <div>Clock</div>
+      </div>
     </div>
   </div>
 `
@@ -134,6 +158,13 @@ customElements.define('desktop-app',
      * @type {number}
      */
     #nextWindowY = 20
+
+    /**
+     * The div-element wrapping the application.
+     *
+     * @type {HTMLElement}
+     */
+    #appElement
 
     /**
      * The div-element acting as the desktop where windows are opened.
@@ -166,14 +197,15 @@ customElements.define('desktop-app',
       this.attachShadow({ mode: 'open' })
         .appendChild(template.content.cloneNode(true))
 
+      this.#appElement = this.shadowRoot.querySelector('#app')
       this.#desktopElement = this.shadowRoot.querySelector('#desktop')
       this.#fullScreenToggleElement = this.shadowRoot.querySelector('#full-screen')
       this.#themeToggleElement = this.shadowRoot.querySelector('#theme-mode')
 
-      /* this.#fullScreenToggleElement.addEventListener('click', event => {
+      this.#themeToggleElement.addEventListener('click', event => {
         event.stopPropagation()
-        this.#toggleFullScreen()
-      }) */
+        this.#toggleThemeHandler()
+      })
 
       this.#fullScreenToggleElement.addEventListener('click', event => {
         event.stopPropagation()
@@ -258,6 +290,14 @@ customElements.define('desktop-app',
       } else {
         document.exitFullscreen()
       }
+    }
+
+    /**
+     * Toggle theme between dark and light.
+     *
+     */
+    #toggleThemeHandler () {
+      this.#appElement.classList.toggle('dark-mode')
     }
 
     /**

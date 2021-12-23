@@ -43,14 +43,20 @@ customElements.define('local-weather-illustration',
      *
      * @type {object}
      */
-    #sun = {
-      x: 30,
-      y: 50,
-      size: 30,
-      shadow: 4,
-      shadowSpeed: 0.3,
-      dx: 4,
-      dy: 3
+    #elements = {
+      sun: {
+        x: 30,
+        y: 50,
+        size: 30,
+        shadow: 4,
+        shadowSpeed: 0.3,
+        alpha: 0,
+        alphaSpeed: 0.1,
+        dx: 4,
+        dy: 3,
+        moveOut: this.#moveSun(false),
+        moveIn: this.#moveSun(true)
+      }
     }
 
     /**
@@ -69,7 +75,7 @@ customElements.define('local-weather-illustration',
 
     connectedCallback () {
       // TODO: Add test animations with timeout.
-      this.#moveSun('in')
+      this.#elements.sun.moveIn()
     }
 
     /**
@@ -78,7 +84,7 @@ customElements.define('local-weather-illustration',
      */
     #drawSun () {
       const ctx = this.#ctx
-      const sun = this.#sun
+      const sun = this.#elements.sun
 
       ctx.beginPath()
       ctx.arc(sun.x, sun.y, sun.size, 0, (Math.PI * 2))
@@ -89,31 +95,29 @@ customElements.define('local-weather-illustration',
     /**
      * Move/animate the sun on the canvas.
      *
-     * @param {string} direction - in or out to set direction of move.
+     * @param {boolean} goingIn - True for in or False for out, to set direction of move.
      */
-    #moveSun (direction) {
+    #moveSun (goingIn) {
       const ctx = this.#ctx
-      const sun = this.#sun
+      const sun = this.#elements.sun
       ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height)
       this.#drawSun()
 
-      if (direction === 'in' || direction === 'out') {
-        if (direction === 'in') {
-          if (!(sun.x > this.#canvas.width / 2)) {
-            sun.x += sun.dx
-          }
-
-          ctx.shadowColor = '#FFE000'
-          ctx.shadowBlur = sun.shadow += sun.shadowSpeed
-
-          if (ctx.shadowBlur > 30 || ctx.shadowBlur < 3) {
-            sun.shadowSpeed *= -1
-          }
-        } else if (direction === 'out') {
-          sun.x -= sun.dx
+      if (direction) {
+        if (!(sun.x > this.#canvas.width / 2)) {
+          sun.x += sun.dx
         }
 
-        requestAnimationFrame(this.#moveSun.bind(this, direction))
+        ctx.shadowColor = '#FFE000'
+        ctx.shadowBlur = sun.shadow += sun.shadowSpeed
+
+        if (ctx.shadowBlur > 30 || ctx.shadowBlur < 3) {
+          sun.shadowSpeed *= -1
+        }
+      } else {
+        sun.x -= sun.dx
       }
+
+      requestAnimationFrame(this.#moveSun.bind(this, direction))
     }
   })

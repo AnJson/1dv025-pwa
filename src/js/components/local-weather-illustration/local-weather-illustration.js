@@ -54,8 +54,8 @@ customElements.define('local-weather-illustration',
         alphaSpeed: 0.1,
         dx: 4,
         dy: 3,
-        moveOut: this.#moveSun(false),
-        moveIn: this.#moveSun(true)
+        moveOut: this.#moveSun.bind(this, false),
+        moveIn: this.#moveSun.bind(this, true)
       }
     }
 
@@ -95,15 +95,15 @@ customElements.define('local-weather-illustration',
     /**
      * Move/animate the sun on the canvas.
      *
-     * @param {boolean} goingIn - True for in or False for out, to set direction of move.
+     * @param {boolean} moveIn - True for in or False for out, to set direction of move.
      */
-    #moveSun (goingIn) {
+    #moveSun (moveIn) {
       const ctx = this.#ctx
       const sun = this.#elements.sun
       ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height)
       this.#drawSun()
 
-      if (direction) {
+      if (moveIn) {
         if (!(sun.x > this.#canvas.width / 2)) {
           sun.x += sun.dx
         }
@@ -118,6 +118,6 @@ customElements.define('local-weather-illustration',
         sun.x -= sun.dx
       }
 
-      requestAnimationFrame(this.#moveSun.bind(this, direction))
+      requestAnimationFrame(this.#moveSun.bind(this, moveIn))
     }
   })

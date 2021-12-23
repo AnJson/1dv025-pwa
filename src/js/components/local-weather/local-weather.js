@@ -1,4 +1,5 @@
 import * as constants from './lib/constants.js'
+import '../local-weather-illustration/'
 
 const template = document.createElement('template')
 
@@ -15,11 +16,13 @@ template.innerHTML = `
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 60em;
-      height: 70em;
+      width: 40em;
+      height: 50em;
     }
   </style>
-  <div id="main">Weather</div>
+  <div id="main">
+    <local-weather-illustration id="illustration"></local-weather-illustration>
+  </div>
 `
 
 customElements.define('local-weather',
@@ -29,6 +32,13 @@ customElements.define('local-weather',
    */
   class extends HTMLElement {
     /**
+     * The custom local-weather-illustration element.
+     *
+     * @type {HTMLElement}
+     */
+    #illustration
+
+    /**
      * Create instance of class and attach open shadow-dom.
      *
      */
@@ -37,13 +47,16 @@ customElements.define('local-weather',
 
       this.attachShadow({ mode: 'open' })
         .appendChild(template.content.cloneNode(true))
+
+      this.#illustration = this.shadowRoot.querySelector('#illustration')
     }
 
     // TODO: This is just for test.
     connectedCallback () {
-      this.#getCitySearchResult('väster')
+      // this.#getCitySearchResult('väster')
     }
 
+    // TODO: Data fetch ok, handle this later.
     async #getCitySearchResult (city) {
       try {
         const data = await this.#getCities(city)
@@ -68,8 +81,8 @@ customElements.define('local-weather',
      * @returns {Promise} - Promise for json-data
      */
     async #getCities (search) {
-      const response = window.fetch(`${constants.CITIES_BASE_URL}?query=${search}&format=json&apikey=${constants.CITIES_API_KEY}`)
+      const response = await window.fetch(`${constants.CITIES_BASE_URL}?query=${search}&format=json&apikey=${constants.CITIES_API_KEY}`)
 
-      return response
+      return response.json()
     }
   })

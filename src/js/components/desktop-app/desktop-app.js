@@ -18,6 +18,7 @@ template.innerHTML = `
       width: 100%;
       height: 100vh;
       font-size: 10px;
+      overflow: hidden;
       --color-inactive-text: rgb(62, 62, 63);
       --color-inactive-background: rgba(250, 248, 243, 0.97);
       --color-active-background: rgb(255, 250, 247);

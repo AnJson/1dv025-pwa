@@ -9,9 +9,6 @@ template.innerHTML = `
       display: flex;
       flex-direction: column;
       font-size: 10px;
-      height: 60vh;
-      width: 80em; 
-      min-height: 60em;
       box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
       border-radius: 3px;
       overflow: hidden;

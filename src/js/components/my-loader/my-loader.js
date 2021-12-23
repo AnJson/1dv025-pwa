@@ -2,6 +2,13 @@ const template = document.createElement('template')
 
 template.innerHTML = `
   <style>
+    :host {
+      display: block;
+      width: 100%;
+      height: 400px;
+      min-width: 400px;
+    }
+
     .loader-wrapper {
       height: 100%;
       width: 100%;

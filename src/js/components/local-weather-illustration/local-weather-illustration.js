@@ -1,3 +1,5 @@
+import { Sun } from './lib/Sun.js'
+
 const template = document.createElement('template')
 
 template.innerHTML = `
@@ -39,25 +41,21 @@ customElements.define('local-weather-illustration',
     #ctx
 
     /**
-     * The sun in the canvas.
+     * A collection of elements in the canvas.
      *
      * @type {object}
      */
     #elements = {
-      sun: {
-        x: 30,
-        y: 50,
-        size: 30,
-        shadow: 4,
-        shadowSpeed: 0.3,
-        alpha: 0,
-        alphaSpeed: 0.1,
-        dx: 4,
-        dy: 3,
-        moveOut: this.#moveSun.bind(this, false),
-        moveIn: this.#moveSun.bind(this, true)
-      }
+      sun: new Sun(4, 0.3, 30, 30, 50, 4, 3, 0, 0.1),
+      moon: new Sun(4, 0.3, 30, 30, 150, 4, 3, 0, 0.1)
     }
+
+    /**
+     * An array of elements currently on display in canvas.
+     *
+     * @type {object[]}
+     */
+    #elementsOnDisplay = [this.#elements.sun, this.#elements.moon]
 
     /**
      * Create instance of class and attach open shadow-dom.
@@ -75,49 +73,30 @@ customElements.define('local-weather-illustration',
 
     connectedCallback () {
       // TODO: Add test animations with timeout.
-      this.#elements.sun.moveIn()
+      this.#paintCanvas()
+      this.moveInElement(this.#elements.sun)
+      this.moveInElement(this.#elements.moon)
+    }
+
+    // TODO: Testing the animation. Remove this.
+    async moveInElement (el) {
+      await el.moveIn(this.#canvas)
+      console.log('done')
     }
 
     /**
-     * Draw sun on canvas.
+     * Paint all elements in elementsOnDisplay-field on the canvas as long as there is any.
      *
      */
-    #drawSun () {
-      const ctx = this.#ctx
-      const sun = this.#elements.sun
+    #paintCanvas () {
+      this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height)
 
-      ctx.beginPath()
-      ctx.arc(sun.x, sun.y, sun.size, 0, (Math.PI * 2))
-      ctx.fillStyle = '#FFE000'
-      ctx.fill()
-    }
-
-    /**
-     * Move/animate the sun on the canvas.
-     *
-     * @param {boolean} moveIn - True for in or False for out, to set direction of move.
-     */
-    #moveSun (moveIn) {
-      const ctx = this.#ctx
-      const sun = this.#elements.sun
-      ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height)
-      this.#drawSun()
-
-      if (moveIn) {
-        if (!(sun.x > this.#canvas.width / 2)) {
-          sun.x += sun.dx
-        }
-
-        ctx.shadowColor = '#FFE000'
-        ctx.shadowBlur = sun.shadow += sun.shadowSpeed
-
-        if (ctx.shadowBlur > 30 || ctx.shadowBlur < 3) {
-          sun.shadowSpeed *= -1
-        }
-      } else {
-        sun.x -= sun.dx
+      for (const element of this.#elementsOnDisplay) {
+        element.drawAnimation(this.#ctx)
       }
 
-      requestAnimationFrame(this.#moveSun.bind(this, moveIn))
+      if (this.#elementsOnDisplay.length) {
+        requestAnimationFrame(this.#paintCanvas.bind(this))
+      }
     }
   })

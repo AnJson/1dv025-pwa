@@ -1,5 +1,6 @@
 import * as constants from './lib/constants.js'
 import '../local-weather-illustration/'
+import '../local-weather-search/'
 
 const template = document.createElement('template')
 
@@ -15,13 +16,52 @@ template.innerHTML = `
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       width: 40em;
-      height: 50em;
+      min-height: 30em;
+      box-sizing: border-box;
+    }
+
+    #content {
+      padding: 0 1em 1em;
+      box-sizing: border-box;
+    }
+
+    #city-name {
+      font-family: sans-serif;
+      font-size: 3em;
+      color: var(--color-text);
+      margin-bottom: 0;
+    }
+
+    #date {
+      font-family: sans-serif;
+      font-weight: 400;
+      font-size: 1.8em;
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    local-weather-search::part(input) {
+      background-color: var(--color-active-background);
+      color: var(--color-text);
+    }
+
+    local-weather-search::part(input):focus {
+      outline: none;
+    }
+
+    local-weather-search::part(list) {
+      background-color: var(--color-inactive-background);
+      color: var(--color-text);
     }
   </style>
   <div id="main">
-    <local-weather-illustration id="illustration"></local-weather-illustration>
+    <local-weather-search></local-weather-search>
+    <div id="content">
+      <h2 id="city-name">Stockholm</h2>
+      <h3 id="date">Thursday 6/1</h3>
+      <local-weather-illustration id="illustration"></local-weather-illustration>
+    </div>
   </div>
 `
 
@@ -39,6 +79,20 @@ customElements.define('local-weather',
     #illustration
 
     /**
+     * H2 element displaying city-name.
+     *
+     * @type {HTMLElement}
+     */
+    #cityNameElement
+
+    /**
+     * H3 element displaying date.
+     *
+     * @type {HTMLElement}
+     */
+    #dateElement
+
+    /**
      * Create instance of class and attach open shadow-dom.
      *
      */
@@ -49,6 +103,8 @@ customElements.define('local-weather',
         .appendChild(template.content.cloneNode(true))
 
       this.#illustration = this.shadowRoot.querySelector('#illustration')
+      this.#cityNameElement = this.shadowRoot.querySelector('#city-name')
+      this.#dateElement = this.shadowRoot.querySelector('#date')
     }
 
     // TODO: This is just for test.

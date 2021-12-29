@@ -43,7 +43,7 @@ export class Sun extends WeatherIllustration {
     this.shadow += this.shadowSpeed
     ctx.shadowBlur = this.shadow
 
-    if (this.shadow > 30 || this.shadow < 3) {
+    if (this.shadow > 25 || this.shadow < 8) {
       this.shadowSpeed *= -1
     }
   }

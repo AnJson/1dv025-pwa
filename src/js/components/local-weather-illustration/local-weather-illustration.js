@@ -12,9 +12,8 @@ template.innerHTML = `
     }
 
     #canvas {
-      width: 300;
+      width: 100%;
       height: 200px;
-      background-color: green;
     }
   </style>
   <canvas id="canvas"></canvas>
@@ -46,8 +45,7 @@ customElements.define('local-weather-illustration',
      * @type {object}
      */
     #elements = {
-      sun: new Sun(4, 0.3, 30, 30, 50, 4, 3, 0, 0.1),
-      moon: new Sun(4, 0.3, 30, 30, 150, 4, 3, 0, 0.1)
+      sun: new Sun(10, 0.3, 30, 30, 70, 4, 3, 0, 0.1)
     }
 
     /**
@@ -55,7 +53,7 @@ customElements.define('local-weather-illustration',
      *
      * @type {object[]}
      */
-    #elementsOnDisplay = [this.#elements.sun, this.#elements.moon]
+    #elementsOnDisplay = [this.#elements.sun]
 
     /**
      * Create instance of class and attach open shadow-dom.
@@ -75,7 +73,6 @@ customElements.define('local-weather-illustration',
       // TODO: Add test animations with timeout.
       this.#paintCanvas()
       this.moveInElement(this.#elements.sun)
-      this.moveInElement(this.#elements.moon)
     }
 
     // TODO: Testing the animation. Remove this.

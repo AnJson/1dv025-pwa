@@ -82,6 +82,8 @@ customElements.define('local-weather-search',
       this.#cityList = this.shadowRoot.querySelector('#cities')
 
       this.#inputField.addEventListener('input', event => {
+        event.stopPropagation()
+
         if (event instanceof InputEvent) {
           if (this.#inputField.value.trim() !== '') {
             this.#inputHandler()
@@ -90,6 +92,19 @@ customElements.define('local-weather-search',
           this.#inputField.blur()
           this.#inputField.focus()
         }
+      })
+
+      this.#cityList.addEventListener('click', event => {
+        if (event.target.matches('li')) {
+          const data = {
+            city: event.target.getAttribute('data-city'),
+            county: event.target.getAttribute('data-county'),
+            longitude: event.target.getAttribute('data-long'),
+            latitude: event.target.getAttribute('data-lat')
+          }
+          this.#citySelectedHandler(data)
+        }
+        this.clearResults()
       })
     }
 
@@ -106,34 +121,45 @@ customElements.define('local-weather-search',
     }
 
     /**
-     * Populate the datalist with search-results as autocomplete.
+     * Dispatch selected-event and send data of selected city in detail.
      *
-     * @param {Array} data - Result passed from fetch.
+     * @param {object} cityData - Data to send in event.
      */
-     #generateAutocomplete (data) {
-      while (this.#cityList.lastChild) {
-        this.#cityList.removeChild(this.#cityList.lastChild)
-      }
+    #citySelectedHandler (cityData) {
+      this.dispatchEvent(new CustomEvent('selected', {
+        detail: {
+          cityData
+        }
+      }))
+    }
 
-      const cities = []
+    /**
+     * Populate the city-list with search-results as autocomplete.
+     *
+     * @param {object[]} cities - Result passed from fetch.
+     */
+    showSearchResult (cities) {
+      this.clearResults()
 
-      // NOTE: Fix accordingly to data.
-      for (let i = 0; i < data[1].length; i++) {
-        cities.push({
-          city: data[1][i],
-          url: data[3][i]
-        })
-      }
-
-      // NOTE: Fix accordingly to data.
       cities.forEach(result => {
         const li = document.createElement('li')
         li.textContent = `${result.city}, ${result.county}`
         li.setAttribute('data-city', result.city)
-        li.setAttribute('data-long', result.long)
-        li.setAttribute('data-lat', result.lat)
+        li.setAttribute('data-county', result.county)
+        li.setAttribute('data-long', result.longitude)
+        li.setAttribute('data-lat', result.latitude)
 
         this.#cityList.appendChild(li)
       })
+    }
+
+    /**
+     * Clear the list from list-elements.
+     *
+     */
+    clearResults () {
+      while (this.#cityList.lastChild) {
+        this.#cityList.removeChild(this.#cityList.lastChild)
+      }
     }
   })

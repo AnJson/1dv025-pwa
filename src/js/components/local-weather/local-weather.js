@@ -56,7 +56,7 @@ template.innerHTML = `
     }
   </style>
   <div id="main">
-    <local-weather-search></local-weather-search>
+    <local-weather-search id="search"></local-weather-search>
     <div id="content">
       <h2 id="city-name">Stockholm</h2>
       <h3 id="date">Thursday 6/1</h3>
@@ -77,6 +77,13 @@ customElements.define('local-weather',
      * @type {HTMLElement}
      */
     #illustration
+
+    /**
+     * The custom local-weather-search element.
+     *
+     * @type {HTMLElement}
+     */
+    #searchElement
 
     /**
      * H2 element displaying city-name.
@@ -103,8 +110,24 @@ customElements.define('local-weather',
         .appendChild(template.content.cloneNode(true))
 
       this.#illustration = this.shadowRoot.querySelector('#illustration')
+      this.#searchElement = this.shadowRoot.querySelector('#search')
       this.#cityNameElement = this.shadowRoot.querySelector('#city-name')
       this.#dateElement = this.shadowRoot.querySelector('#date')
+
+      this.#searchElement.addEventListener('input', event => {
+        if (event.detail.value.length >= 4) {
+          clearTimeout(this.citySearchDebounce)
+          this.citySearchDebounce = setTimeout(() => {
+            this.#showCitySearchResult(event.detail.value)
+          }, 800)
+        } else {
+          this.#searchElement.clearResults()
+        }
+      })
+
+      this.#searchElement.addEventListener('selected', event => {
+        console.log(event.detail)
+      })
     }
 
     // TODO: This is just for test.
@@ -112,21 +135,44 @@ customElements.define('local-weather',
       // this.#getCitySearchResult('väster')
     }
 
-    // TODO: Data fetch ok, handle this later.
-    async #getCitySearchResult (city) {
+    #filterLocation (locations) {
+      const hash = {}
+
+      return locations.filter(location => {
+        const county = location.county.toLowerCase()
+        const city = location.city.toLowerCase()
+
+        if (!Object.keys(hash).includes(county)) {
+          hash[county] = [city]
+          return true
+        } else if (!hash[county].includes(city)) {
+          hash[county].push(city)
+          return true
+        } else {
+          return false
+        }
+      })
+    }
+
+    /**
+     * Search for cities and trigger showSearchResult in local-weather-search.
+     *
+     * @param {string} city - Search text.
+     */
+    async #showCitySearchResult (city) {
       try {
-        const data = await this.#getCities(city)
-        console.log(data)
-        /* const cityResults = data.results
-          .map(result => ({
+        if (city.length >= 4) {
+          const data = await this.#getCities(city)
+          const formattedResult = this.#filterLocation(data.results).map(result => ({
             city: result.city,
             county: result.county,
             latitude: result.latitude,
             longitude: result.longitude
-          })) */
-      } catch (error) {
-        console.log('Something went wrong.')
-        console.log(error)
+          }))
+
+          this.#searchElement.showSearchResult(formattedResult)
+        }
+      } catch {
       }
     }
 

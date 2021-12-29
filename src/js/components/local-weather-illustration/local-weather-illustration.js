@@ -78,7 +78,6 @@ customElements.define('local-weather-illustration',
     // TODO: Testing the animation. Remove this.
     async moveInElement (el) {
       await el.moveIn(this.#canvas)
-      console.log('done')
     }
 
     /**

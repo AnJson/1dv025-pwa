@@ -23,4 +23,27 @@ export class WeatherIllustration {
     this.alpha = alpha
     this.alphaSpeed = alphaSpeed
   }
+
+  /**
+   * Move one step (dx) to given direction.
+   *
+   * @param {string} direction - Which direction to move.
+   */
+  step (direction = 'right') {
+    if (direction === 'right') {
+      this.x += this.dx
+    }
+
+    if (direction === 'left') {
+      this.x -= this.dx
+    }
+
+    if (direction === 'up') {
+      this.y -= this.dy
+    }
+
+    if (direction === 'down') {
+      this.y += this.dy
+    }
+  }
 }

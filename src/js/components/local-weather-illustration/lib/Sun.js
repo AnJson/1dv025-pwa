@@ -62,13 +62,14 @@ export class Sun extends WeatherIllustration {
        * @returns {Promise} - A promise that is resolved.
        */
       const move = () => {
-        this.x += this.dx
+        this.step('right')
 
         if (this.x >= canvas.width / 2) {
           return resolve()
         }
         requestAnimationFrame(move)
       }
+
       move()
     })
   }

@@ -215,9 +215,10 @@ customElements.define('local-weather',
       try {
         this.#hideAllInContentDiv()
         this.#loaderElement.classList.remove('hidden')
-        const weatherData = await this.#getWeather(data.longitude, data.latitude)
+        const weatherData = await this.#getWeather(Number.parseFloat(data.longitude).toFixed(3), Number.parseFloat(data.latitude).toFixed(3))
         console.log(weatherData)
-      } catch {
+      } catch (error) {
+        console.log(error)
         this.#hideAllInContentDiv()
         this.#noResultElement.classList.remove('hidden')
       }
@@ -260,8 +261,8 @@ customElements.define('local-weather',
     /**
      * Fetch for weather for selected longitude and latitude.
      *
-     * @param {string} longitude - Longitude.
-     * @param {string} latitude - Latitude.
+     * @param {number} longitude - Longitude with three decimals.
+     * @param {number} latitude - Latitude with three decimals.
      * @returns {Promise} - Promise for json-data.
      */
     async #getWeather (longitude, latitude) {

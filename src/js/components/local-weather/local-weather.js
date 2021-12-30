@@ -121,6 +121,7 @@ customElements.define('local-weather',
             this.#showCitySearchResult(event.detail.value)
           }, 800)
         } else {
+          clearTimeout(this.citySearchDebounce)
           this.#searchElement.clearResults()
         }
       })

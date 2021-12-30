@@ -41,6 +41,45 @@ template.innerHTML = `
       margin: 0;
     }
 
+    #skeleton-city-name {
+      position: relative;
+      display: block;
+      width: 40%;
+      height: 3em;
+      border-radius: 1em;
+      margin-bottom: .7em;
+      margin-top: 2.2em;
+      overflow: hidden;
+    }
+
+    #skeleton-date {
+      position: relative;
+      display: block;
+      width: 60%;
+      height: 1.8em;
+      border-radius: 1em;
+      margin: 0;
+      overflow: hidden;
+    }
+    
+    .skeleton-box {
+      background: 
+        linear-gradient(0.25turn, transparent, #666, transparent),
+        linear-gradient(#333, #333),
+        radial-gradient(38px circle at 19px 19px, #333 50%, transparent 51%),
+        linear-gradient(#333, #333);  
+      background-repeat: no-repeat;
+      background-size: 315px 250px, 315px 180px, 100px 100px, 225px 30px; 
+      background-position: -315px 0, 0 0, 0px 190px, 50px 195px; 
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {  
+      to {
+        background-position: 315px 0, 0 0, 0 190px, 50px 195px;
+      }
+    }
+
     local-weather-search::part(input) {
       background-color: var(--color-active-background);
       color: var(--color-text);
@@ -71,13 +110,18 @@ template.innerHTML = `
   <div id="main">
     <local-weather-search id="search"></local-weather-search>
     <div id="content">
-      <div id="weather">
-        <h2 id="city-name">Stockholm</h2>
-        <h3 id="date">Thursday 6/1</h3>
-        <local-weather-illustration id="illustration"></local-weather-illustration>
+      <div id="location">
+        <div id="location-data">
+          <h2 id="city-name">Stockholm</h2>
+          <h3 id="date">Thursday 6/1</h3>
+        </div>
+        <div id="skeleton-location-data" class="hidden">
+          <div id="skeleton-city-name" class="skeleton-box"></div>
+          <div id="skeleton-date" class="skeleton-box"></div>
+        </div>
+        <h2 id="no-result" class="hidden">No results, try again...</h2>
       </div>
-      <my-loader id="loader"></my-loader>
-      <h2 id="no-result">No results, try again...</h2>
+      <local-weather-illustration id="illustration"></local-weather-illustration>
     </div>
   </div>
 `
@@ -103,11 +147,11 @@ customElements.define('local-weather',
     #searchElement
 
     /**
-     * Div element holding the content below search-input.
+     * Div element holding the city-name and time for forecast.
      *
      * @type {HTMLElement}
      */
-    #contentElement
+    #locationDataElement
 
     /**
      * H2 element displaying city-name.
@@ -124,18 +168,18 @@ customElements.define('local-weather',
     #dateElement
 
     /**
-     * Div element displaying weather-data.
+     * Wrapper div for location, no-result-message and loader.
      *
      * @type {HTMLElement}
      */
-    #weatherElement
+    #locationElement
 
     /**
-     * Custom my-loader element.
+     * Div to hold skeleton of locationElement, to illustrate loading.
      *
      * @type {HTMLElement}
      */
-    #loaderElement
+    #skeletonLoaderElement
 
     /**
      * H2 element that signals no results in weather search.
@@ -155,12 +199,12 @@ customElements.define('local-weather',
         .appendChild(template.content.cloneNode(true))
 
       this.#searchElement = this.shadowRoot.querySelector('#search')
-      this.#contentElement = this.shadowRoot.querySelector('#content')
-      this.#weatherElement = this.shadowRoot.querySelector('#weather')
+      this.#locationDataElement = this.shadowRoot.querySelector('#location-data')
+      this.#locationElement = this.shadowRoot.querySelector('#location')
       this.#illustration = this.shadowRoot.querySelector('#illustration')
       this.#cityNameElement = this.shadowRoot.querySelector('#city-name')
       this.#dateElement = this.shadowRoot.querySelector('#date')
-      this.#loaderElement = this.shadowRoot.querySelector('#loader')
+      this.#skeletonLoaderElement = this.shadowRoot.querySelector('#skeleton-location-data')
       this.#noResultElement = this.shadowRoot.querySelector('#no-result')
 
       this.#searchElement.addEventListener('input', event => {
@@ -213,13 +257,14 @@ customElements.define('local-weather',
      */
     async #showLocalWeather (data) {
       try {
-        this.#hideAllInContentDiv()
-        this.#loaderElement.classList.remove('hidden')
+        this.#hideAllInLocationDiv()
+        this.#skeletonLoaderElement.classList.remove('hidden')
         const weatherData = await this.#getWeather(Number.parseFloat(data.longitude).toFixed(3), Number.parseFloat(data.latitude).toFixed(3))
+        // TODO: Set location name, date and time. Set the forecast temperature wind etc. Then hide the loader.
         console.log(weatherData)
       } catch (error) {
         console.log(error)
-        this.#hideAllInContentDiv()
+        this.#hideAllInLocationDiv()
         this.#noResultElement.classList.remove('hidden')
       }
     }
@@ -275,8 +320,8 @@ customElements.define('local-weather',
      * Hide all elements in content-div.
      *
      */
-    #hideAllInContentDiv () {
-      for (const element of this.#contentElement.children) {
+    #hideAllInLocationDiv () {
+      for (const element of this.#locationElement.children) {
         element.classList.add('hidden')
       }
     }

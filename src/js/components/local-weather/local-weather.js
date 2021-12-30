@@ -54,13 +54,30 @@ template.innerHTML = `
       background-color: var(--color-inactive-background);
       color: var(--color-text);
     }
+
+    #loader {
+      height: 30em;
+    }
+
+    #no-result {
+      color: var(--color-text);
+      font-family: sans-serif;
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
   <div id="main">
     <local-weather-search id="search"></local-weather-search>
     <div id="content">
-      <h2 id="city-name">Stockholm</h2>
-      <h3 id="date">Thursday 6/1</h3>
-      <local-weather-illustration id="illustration"></local-weather-illustration>
+      <div id="weather">
+        <h2 id="city-name">Stockholm</h2>
+        <h3 id="date">Thursday 6/1</h3>
+        <local-weather-illustration id="illustration"></local-weather-illustration>
+      </div>
+      <my-loader id="loader"></my-loader>
+      <h2 id="no-result">No results, try again...</h2>
     </div>
   </div>
 `
@@ -86,6 +103,13 @@ customElements.define('local-weather',
     #searchElement
 
     /**
+     * Div element holding the content below search-input.
+     *
+     * @type {HTMLElement}
+     */
+    #contentElement
+
+    /**
      * H2 element displaying city-name.
      *
      * @type {HTMLElement}
@@ -100,6 +124,27 @@ customElements.define('local-weather',
     #dateElement
 
     /**
+     * Div element displaying weather-data.
+     *
+     * @type {HTMLElement}
+     */
+    #weatherElement
+
+    /**
+     * Custom my-loader element.
+     *
+     * @type {HTMLElement}
+     */
+    #loaderElement
+
+    /**
+     * H2 element that signals no results in weather search.
+     *
+     * @type {HTMLElement}
+     */
+    #noResultElement
+
+    /**
      * Create instance of class and attach open shadow-dom.
      *
      */
@@ -109,10 +154,14 @@ customElements.define('local-weather',
       this.attachShadow({ mode: 'open' })
         .appendChild(template.content.cloneNode(true))
 
-      this.#illustration = this.shadowRoot.querySelector('#illustration')
       this.#searchElement = this.shadowRoot.querySelector('#search')
+      this.#contentElement = this.shadowRoot.querySelector('#content')
+      this.#weatherElement = this.shadowRoot.querySelector('#weather')
+      this.#illustration = this.shadowRoot.querySelector('#illustration')
       this.#cityNameElement = this.shadowRoot.querySelector('#city-name')
       this.#dateElement = this.shadowRoot.querySelector('#date')
+      this.#loaderElement = this.shadowRoot.querySelector('#loader')
+      this.#noResultElement = this.shadowRoot.querySelector('#no-result')
 
       this.#searchElement.addEventListener('input', event => {
         if (event.detail.value.length >= 4) {
@@ -127,15 +176,17 @@ customElements.define('local-weather',
       })
 
       this.#searchElement.addEventListener('selected', event => {
-        console.log(event.detail)
+        event.stopPropagation()
+        this.#showLocalWeather(event.detail.cityData)
       })
     }
 
-    // TODO: This is just for test.
-    connectedCallback () {
-      // this.#getCitySearchResult('väster')
-    }
-
+    /**
+     * Filter duplicate cities in search-result.
+     *
+     * @param {object[]} locations - Array of objects from search-result.
+     * @returns {object[]} - Filtered search-result.
+     */
     #filterLocation (locations) {
       const hash = {}
 
@@ -153,6 +204,23 @@ customElements.define('local-weather',
           return false
         }
       })
+    }
+
+    /**
+     * Search weather for selected location and trigger showWeather in local-weather-search.
+     *
+     * @param {object} data - Search-object containing city, county, longitude, latitude.
+     */
+    async #showLocalWeather (data) {
+      try {
+        this.#hideAllInContentDiv()
+        this.#loaderElement.classList.remove('hidden')
+        const weatherData = await this.#getWeather(data.longitude, data.latitude)
+        console.log(weatherData)
+      } catch {
+        this.#hideAllInContentDiv()
+        this.#noResultElement.classList.remove('hidden')
+      }
     }
 
     /**
@@ -178,14 +246,37 @@ customElements.define('local-weather',
     }
 
     /**
-     * Search for cities and response is in json.
+     * Fetch cities by city-name and response is in json.
      *
      * @param {string} search - Search-string (city-name).
-     * @returns {Promise} - Promise for json-data
+     * @returns {Promise} - Promise for json-data.
      */
     async #getCities (search) {
       const response = await window.fetch(`${constants.CITIES_BASE_URL}?query=${search}&format=json&apikey=${constants.CITIES_API_KEY}`)
 
       return response.json()
+    }
+
+    /**
+     * Fetch for weather for selected longitude and latitude.
+     *
+     * @param {string} longitude - Longitude.
+     * @param {string} latitude - Latitude.
+     * @returns {Promise} - Promise for json-data.
+     */
+    async #getWeather (longitude, latitude) {
+      const response = await window.fetch(`${constants.WEATHER_BASE_URL}lon/${longitude}/lat/${latitude}/data.json`)
+
+      return response.json()
+    }
+
+    /**
+     * Hide all elements in content-div.
+     *
+     */
+    #hideAllInContentDiv () {
+      for (const element of this.#contentElement.children) {
+        element.classList.add('hidden')
+      }
     }
   })

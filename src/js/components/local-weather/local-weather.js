@@ -1,3 +1,4 @@
+import svgUrl from './lib/symbol-defs.svg'
 import * as constants from './lib/constants.js'
 import '../local-weather-illustration/'
 import '../local-weather-search/'
@@ -22,13 +23,33 @@ template.innerHTML = `
     }
 
     #content {
+      position: relative;
       padding: 0 1em 1em;
       box-sizing: border-box;
     }
 
+    #position-icon-wrapper {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      color: var(--color-inactive-text);
+      cursor: pointer;
+    }
+
+    #position-icon-wrapper:hover {
+      color: var(--color-text);
+    }
+
+    #my-position-icon {
+      width: 2em;
+      height: 2em;
+      fill: currentColor;
+      transition: all 300ms;
+    }
+
     #city-name {
       font-family: sans-serif;
-      font-size: 3em;
+      font-size: 2em;
       color: var(--color-text);
       margin-bottom: 0;
     }
@@ -36,7 +57,7 @@ template.innerHTML = `
     #date {
       font-family: sans-serif;
       font-weight: 400;
-      font-size: 1.8em;
+      font-size: 1.6em;
       color: var(--color-text);
       margin: 0;
     }
@@ -45,10 +66,10 @@ template.innerHTML = `
       position: relative;
       display: block;
       width: 40%;
-      height: 3em;
+      height: 2.5em;
       border-radius: 1em;
-      margin-bottom: .7em;
-      margin-top: 2.2em;
+      margin-bottom: .5em;
+      margin-top: 1.6em;
       overflow: hidden;
     }
 
@@ -56,7 +77,7 @@ template.innerHTML = `
       position: relative;
       display: block;
       width: 60%;
-      height: 1.8em;
+      height: 1.6em;
       border-radius: 1em;
       margin: 0;
       overflow: hidden;
@@ -111,11 +132,16 @@ template.innerHTML = `
     <local-weather-search id="search"></local-weather-search>
     <div id="content">
       <div id="location">
-        <div id="location-data">
+        <div id="location-data" class="hidden">
           <h2 id="city-name">Stockholm</h2>
           <h3 id="date">Thursday 6/1</h3>
+          <div id="position-icon-wrapper">
+            <svg id="my-position-icon">
+              <use href="${svgUrl}#icon-location" />
+            </svg>
         </div>
-        <div id="skeleton-location-data" class="hidden">
+        </div>
+        <div id="skeleton-location-data">
           <div id="skeleton-city-name" class="skeleton-box"></div>
           <div id="skeleton-date" class="skeleton-box"></div>
         </div>
@@ -154,6 +180,13 @@ customElements.define('local-weather',
     #locationDataElement
 
     /**
+     * Svg element to set to local geolocation.
+     *
+     * @type {HTMLElement}
+     */
+    #myPositionIcon
+
+    /**
      * H2 element displaying city-name.
      *
      * @type {HTMLElement}
@@ -189,6 +222,18 @@ customElements.define('local-weather',
     #noResultElement
 
     /**
+     * Data of the current location, defaults to Stockholm.
+     *
+     * @type {object}
+     */
+    #currentLocation = {
+      city: 'Stockholm',
+      county: 'Stocholm',
+      longitude: 18.063,
+      latitude: 59.334
+    }
+
+    /**
      * Create instance of class and attach open shadow-dom.
      *
      */
@@ -201,6 +246,7 @@ customElements.define('local-weather',
       this.#searchElement = this.shadowRoot.querySelector('#search')
       this.#locationDataElement = this.shadowRoot.querySelector('#location-data')
       this.#locationElement = this.shadowRoot.querySelector('#location')
+      this.#myPositionIcon = this.shadowRoot.querySelector('#my-position-icon')
       this.#illustration = this.shadowRoot.querySelector('#illustration')
       this.#cityNameElement = this.shadowRoot.querySelector('#city-name')
       this.#dateElement = this.shadowRoot.querySelector('#date')
@@ -223,6 +269,65 @@ customElements.define('local-weather',
         event.stopPropagation()
         this.#showLocalWeather(event.detail.cityData)
       })
+    }
+
+    // TODO: Comment.
+    connectedCallback () {
+      this.#askForLocation()
+    }
+
+    /**
+     * If geolocation is available ask for current location.
+     *
+     */
+    #askForLocation () {
+      if ('geolocation' in navigator) {
+        try {
+          navigator.geolocation.getCurrentPosition(position => {
+            this.#setCurrentLocation({
+              longitude: position.coords.longitude,
+              latitude: position.coords.longitude
+            })
+            this.#updateLocationText()
+            this.#hideAllInLocationDiv()
+            this.#locationDataElement.classList.remove('hidden')
+            console.log(this.#currentLocation)
+          }, async () => {
+            const weatherData = await this.#getWeather(Number.parseFloat(this.#currentLocation.longitude).toFixed(3), Number.parseFloat(this.#currentLocation.latitude).toFixed(3))
+            this.#updateLocationText()
+            this.#hideAllInLocationDiv()
+            this.#locationDataElement.classList.remove('hidden')
+            // TODO: show results in weather data and illustration.
+          })
+        } catch (error) {
+          console.log(error)
+        }
+      } else {
+        this.#updateLocationText()
+        this.#hideAllInLocationDiv()
+        this.#locationDataElement.classList.remove('hidden')
+      }
+    }
+
+    /**
+     * Set the cityNameElements textcontent by current location-field.
+     *
+     */
+    #updateLocationText () {
+      this.#cityNameElement.textContent = this.#currentLocation.county ? `${this.#currentLocation.city}, ${this.#currentLocation.county}` : `${this.#currentLocation.city}`
+    }
+
+    /**
+     * Update the current location-field object.
+     *
+     * @param {object} position - Object with city-data to set as current location.
+     */
+    #setCurrentLocation (position) {
+      console.log(position)
+      this.#currentLocation.city = position.city ? position.city : 'Your location'
+      this.#currentLocation.county = position.county ? position.county : null
+      this.#currentLocation.longitude = Number.parseFloat(position.longitude).toFixed(3)
+      this.#currentLocation.latitude = Number.parseFloat(position.latitude).toFixed(3)
     }
 
     /**
@@ -260,8 +365,17 @@ customElements.define('local-weather',
         this.#hideAllInLocationDiv()
         this.#skeletonLoaderElement.classList.remove('hidden')
         const weatherData = await this.#getWeather(Number.parseFloat(data.longitude).toFixed(3), Number.parseFloat(data.latitude).toFixed(3))
-        // TODO: Set location name, date and time. Set the forecast temperature wind etc. Then hide the loader.
         console.log(weatherData)
+
+        this.#currentLocation.city = data.city
+        this.#currentLocation.county = data.county
+        this.#currentLocation.longitude = data.longitude
+        this.#currentLocation.latitude = data.latitude
+
+        this.#updateLocationText()
+        // TODO: Set date and time. Set the forecast temperature wind etc.
+        this.#hideAllInLocationDiv()
+        this.#locationDataElement.classList.remove('hidden')
       } catch (error) {
         console.log(error)
         this.#hideAllInLocationDiv()

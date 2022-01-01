@@ -267,6 +267,7 @@ customElements.define('local-weather',
 
       this.#searchElement.addEventListener('selected', event => {
         event.stopPropagation()
+        this.#setCurrentLocation(event.detail.cityData)
         this.#showLocalWeather(event.detail.cityData)
       })
     }
@@ -284,28 +285,34 @@ customElements.define('local-weather',
       if ('geolocation' in navigator) {
         try {
           navigator.geolocation.getCurrentPosition(position => {
+            const longitude = position.coords.longitude
+            const latitude = position.coords.latitude
             this.#setCurrentLocation({
-              longitude: position.coords.longitude,
-              latitude: position.coords.longitude
+              longitude,
+              latitude
             })
-            this.#updateLocationText()
-            this.#hideAllInLocationDiv()
-            this.#locationDataElement.classList.remove('hidden')
-            console.log(this.#currentLocation)
-          }, async () => {
-            const weatherData = await this.#getWeather(Number.parseFloat(this.#currentLocation.longitude).toFixed(3), Number.parseFloat(this.#currentLocation.latitude).toFixed(3))
-            this.#updateLocationText()
-            this.#hideAllInLocationDiv()
-            this.#locationDataElement.classList.remove('hidden')
-            // TODO: show results in weather data and illustration.
+            this.#showLocalWeather({
+              longitude,
+              latitude
+            })
+          }, () => {
+            this.#showLocalWeather({
+              longitude: this.#currentLocation.longitude,
+              latitude: this.#currentLocation.latitude
+            })
           })
         } catch (error) {
           console.log(error)
+          this.#showLocalWeather({
+            longitude: this.#currentLocation.longitude,
+            latitude: this.#currentLocation.latitude
+          })
         }
       } else {
-        this.#updateLocationText()
-        this.#hideAllInLocationDiv()
-        this.#locationDataElement.classList.remove('hidden')
+        this.#showLocalWeather({
+          longitude: this.#currentLocation.longitude,
+          latitude: this.#currentLocation.latitude
+        })
       }
     }
 
@@ -323,7 +330,6 @@ customElements.define('local-weather',
      * @param {object} position - Object with city-data to set as current location.
      */
     #setCurrentLocation (position) {
-      console.log(position)
       this.#currentLocation.city = position.city ? position.city : 'Your location'
       this.#currentLocation.county = position.county ? position.county : null
       this.#currentLocation.longitude = Number.parseFloat(position.longitude).toFixed(3)
@@ -362,25 +368,46 @@ customElements.define('local-weather',
      */
     async #showLocalWeather (data) {
       try {
-        this.#hideAllInLocationDiv()
-        this.#skeletonLoaderElement.classList.remove('hidden')
+        this.#setLoadingState()
         const weatherData = await this.#getWeather(Number.parseFloat(data.longitude).toFixed(3), Number.parseFloat(data.latitude).toFixed(3))
-        console.log(weatherData)
-
-        this.#currentLocation.city = data.city
-        this.#currentLocation.county = data.county
-        this.#currentLocation.longitude = data.longitude
-        this.#currentLocation.latitude = data.latitude
-
-        this.#updateLocationText()
-        // TODO: Set date and time. Set the forecast temperature wind etc.
-        this.#hideAllInLocationDiv()
-        this.#locationDataElement.classList.remove('hidden')
+        this.#showWeatherResult(weatherData)
       } catch (error) {
         console.log(error)
         this.#hideAllInLocationDiv()
         this.#noResultElement.classList.remove('hidden')
       }
+    }
+
+    /**
+     * Set the loading-state of the app.
+     *
+     */
+    #setLoadingState () {
+      // TODO: add support for weather-boxes.
+      this.#hideAllInLocationDiv()
+      this.#skeletonLoaderElement.classList.remove('hidden')
+    }
+
+    /**
+     * Removes the loading-state of the app.
+     *
+     */
+    #removeLoadingState () {
+      // TODO: add support for weather-boxes.
+      this.#hideAllInLocationDiv()
+      this.#skeletonLoaderElement.classList.remove('hidden')
+    }
+
+    /**
+     * Sets up the display of location and weatherforecast.
+     *
+     * @param {object} weather - Weather-forecast from smhi-api.
+     */
+    #showWeatherResult (weather) {
+      console.log(weather)
+      this.#updateLocationText()
+      // TODO: Set date and time. Set the forecast temperature wind etc.
+      this.#removeLoadingState()
     }
 
     /**

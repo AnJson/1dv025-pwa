@@ -134,6 +134,7 @@ template.innerHTML = `
       width: 1.1em;
       height: 1.1em;
       fill: var(--color-text);
+      transform: rotate(-45deg);
     }
 
     #skeleton-weather-data-box-wrapper {
@@ -144,6 +145,7 @@ template.innerHTML = `
     .skeleton-weather-data-box {
       height: 70px;
       width: 65px;
+      border-radius: 3px;
     }
 
     local-weather-search::part(input) {
@@ -214,7 +216,7 @@ template.innerHTML = `
               </svg>
             </span>
           </div>
-          <div class="weather-data-box" id="data-rain">
+          <div class="weather-data-box">
             <span class="weather-data-box__heading">Rain/h</span>
             <span class="weather-data-box__data" id="rain">1.5 mm</span>
           </div>
@@ -320,6 +322,34 @@ customElements.define('local-weather',
     #weatherDataBoxes
 
     /**
+     * Span element to display temperature.
+     *
+     * @type {HTMLElement}
+     */
+    #tempDataElement
+
+    /**
+     * Span element to display wind-speed.
+     *
+     * @type {HTMLElement}
+     */
+    #windDataElement
+
+    /**
+     * Svg-icon to display wind-direction.
+     *
+     * @type {HTMLElement}
+     */
+    #windDirectionIcon
+
+    /**
+     * Span element to display rain/h.
+     *
+     * @type {HTMLElement}
+     */
+    #rainDataElement
+
+    /**
      * Data of the current location, defaults to Stockholm.
      *
      * @type {object}
@@ -351,6 +381,10 @@ customElements.define('local-weather',
       this.#skeletonLocationElement = this.shadowRoot.querySelector('#skeleton-location-data')
       this.#skeletonWeatherDataElement = this.shadowRoot.querySelector('#skeleton-weather-data-box-wrapper')
       this.#weatherDataBoxes = this.shadowRoot.querySelector('#weather-data-box-wrapper')
+      this.#tempDataElement = this.shadowRoot.querySelector('#temp')
+      this.#rainDataElement = this.shadowRoot.querySelector('#rain')
+      this.#windDataElement = this.shadowRoot.querySelector('#wind-strength')
+      this.#windDirectionIcon = this.shadowRoot.querySelector('#wind-direction')
       this.#noResultElement = this.shadowRoot.querySelector('#no-result')
       this.#weatherDataElement = this.shadowRoot.querySelector('#weather-data')
 
@@ -478,7 +512,8 @@ customElements.define('local-weather',
       try {
         this.#setLoadingState()
         const weatherData = await this.#getWeather(Number.parseFloat(data.longitude).toFixed(3), Number.parseFloat(data.latitude).toFixed(3))
-        this.#showWeatherResult(weatherData)
+        const currentWeatherData = this.#filterWeatherData(weatherData.timeSeries)
+        this.#showWeatherResult(currentWeatherData)
       } catch (error) {
         console.log(error)
         this.#setNoResultsState()
@@ -486,11 +521,31 @@ customElements.define('local-weather',
     }
 
     /**
+     * Filter and map the weather-data to contain the most recent weather data.
+     *
+     * @param {object[]} weatherData - Array of with weather-data from all available times.
+     * @returns {object} - Object with the latest and relevent weather data.
+     */
+    #filterWeatherData (weatherData) {
+      const now = Date.now()
+      const latestForecasts = weatherData.filter(data => new Date(data.validTime.substring(0, 19)).getTime() < now)
+      const mappedData = [latestForecasts.pop()].map(data => ({
+        time: data.validTime,
+        temp: data.parameters[10].values[0],
+        windAngle: data.parameters[13].values[0],
+        windSpeed: data.parameters[14].values[0],
+        rain: data.parameters[3].values[0],
+        symbol: data.parameters[18].values[0]
+      }))
+
+      return mappedData[0]
+    }
+
+    /**
      * Set the loading-state of the app.
      *
      */
     #setLoadingState () {
-      // TODO: add support for weather-boxes.
       this.#hideAllInLocationDiv()
       this.#hideAllInWeatherData()
       this.#skeletonLocationElement.classList.remove('hidden')
@@ -502,7 +557,6 @@ customElements.define('local-weather',
      *
      */
     #setShowWeatherState () {
-      // TODO: add support for weather-boxes.
       this.#hideAllInLocationDiv()
       this.#hideAllInWeatherData()
 
@@ -515,7 +569,6 @@ customElements.define('local-weather',
      *
      */
     #setNoResultsState () {
-      // TODO: add support for weather-boxes.
       this.#hideAllInLocationDiv()
       this.#noResultElement.classList.remove('hidden')
     }
@@ -529,6 +582,10 @@ customElements.define('local-weather',
       console.log(weather)
       this.#updateLocationText()
       // TODO: Set date and time. Set the forecast temperature wind etc.
+      this.#tempDataElement.textContent = `${weather.temp}°`
+      this.#windDataElement.textContent = `${weather.windSpeed}m/s`
+      this.#windDirectionIcon.style.transform = `rotate(${weather.windAngle}deg)`
+      this.#rainDataElement.textContent = `${weather.rain} mm`
       this.#setShowWeatherState()
     }
 

@@ -108,17 +108,42 @@ template.innerHTML = `
     .weather-data-box {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-around;
       align-items: center;
-      height: 60px;
+      height: 70px;
       min-width: 50px;
       padding: 0 .8em;
       border-radius: 3px;
       background-color: var(--color-active-background);
       color: var(--color-text);
+    }
+
+    .weather-data-box__heading {
+      font-size: 1.1em;
+      font-family: sans-serif;
+      font-weight: 400;
+    }
+
+    .weather-data-box__data {
       font-size: 1.5em;
       font-family: sans-serif;
       font-weight: 600;
+    }
+
+    #wind-direction-icon {
+      width: 1.1em;
+      height: 1.1em;
+      fill: var(--color-text);
+    }
+
+    #skeleton-weather-data-box-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .skeleton-weather-data-box {
+      height: 70px;
+      width: 65px;
     }
 
     local-weather-search::part(input) {
@@ -175,22 +200,30 @@ template.innerHTML = `
       </div>
       <local-weather-illustration id="illustration"></local-weather-illustration>
       <div id="weather-data">
-        <div id="weather-data-box-wrapper">
-          <div class="weather-data-box" id="data-temp">0.2c</div>
+        <div id="weather-data-box-wrapper" class="hidden">
           <div class="weather-data-box">
-            <div id="data-wind-strength">10 m/s</div>
-            <span id="wind-direction">^</span>
+            <span class="weather-data-box__heading">Temp</span>
+            <span class="weather-data-box__data" id="temp">2.5C</span>
           </div>
-          <div class="weather-data-box" id="data-rain">0.5 mm/h</div>
+          <div class="weather-data-box">
+            <span class="weather-data-box__heading">Wind</span>
+            <span class="weather-data-box__data" id="wind-strength">5 m/s</span>
+            <span class="weather-data-box__data" id="wind-direction">
+              <svg id="wind-direction-icon">
+                <use href="${svgUrl}#icon-compass" />
+              </svg>
+            </span>
+          </div>
+          <div class="weather-data-box" id="data-rain">
+            <span class="weather-data-box__heading">Rain/h</span>
+            <span class="weather-data-box__data" id="rain">1.5 mm</span>
+          </div>
         </div>
-        <!-- <div id="weather-data-boxes">
-          <div class="weather-data-box" id="data-temp">0.2c</div>
-          <div class="weather-data-box">
-            <div id="data-wind-strength">10 m/s</div>
-            <span id="wind-direction">^</span>
-          </div>
-          <div class="weather-data-box" id="data-rain">0.5 mm/h</div>
-        </div> -->
+        <div id="skeleton-weather-data-box-wrapper">
+          <div class="skeleton-weather-data-box skeleton-box"></div>
+          <div class="skeleton-weather-data-box skeleton-box"></div>
+          <div class="skeleton-weather-data-box skeleton-box"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -256,7 +289,14 @@ customElements.define('local-weather',
      *
      * @type {HTMLElement}
      */
-    #skeletonLoaderElement
+    #skeletonLocationElement
+
+    /**
+     * Div to hold skeleton of weather data, to illustrate loading.
+     *
+     * @type {HTMLElement}
+     */
+    #skeletonWeatherDataElement
 
     /**
      * H2 element that signals no results in weather search.
@@ -271,6 +311,13 @@ customElements.define('local-weather',
      * @type {HTMLElement}
      */
     #weatherDataElement
+
+    /**
+     * Container div for weather-data-boxes.
+     *
+     * @type {HTMLElement}
+     */
+    #weatherDataBoxes
 
     /**
      * Data of the current location, defaults to Stockholm.
@@ -301,7 +348,9 @@ customElements.define('local-weather',
       this.#illustration = this.shadowRoot.querySelector('#illustration')
       this.#cityNameElement = this.shadowRoot.querySelector('#city-name')
       this.#dateElement = this.shadowRoot.querySelector('#date')
-      this.#skeletonLoaderElement = this.shadowRoot.querySelector('#skeleton-location-data')
+      this.#skeletonLocationElement = this.shadowRoot.querySelector('#skeleton-location-data')
+      this.#skeletonWeatherDataElement = this.shadowRoot.querySelector('#skeleton-weather-data-box-wrapper')
+      this.#weatherDataBoxes = this.shadowRoot.querySelector('#weather-data-box-wrapper')
       this.#noResultElement = this.shadowRoot.querySelector('#no-result')
       this.#weatherDataElement = this.shadowRoot.querySelector('#weather-data')
 
@@ -443,7 +492,9 @@ customElements.define('local-weather',
     #setLoadingState () {
       // TODO: add support for weather-boxes.
       this.#hideAllInLocationDiv()
-      this.#skeletonLoaderElement.classList.remove('hidden')
+      this.#hideAllInWeatherData()
+      this.#skeletonLocationElement.classList.remove('hidden')
+      this.#skeletonWeatherDataElement.classList.remove('hidden')
     }
 
     /**
@@ -453,7 +504,10 @@ customElements.define('local-weather',
     #setShowWeatherState () {
       // TODO: add support for weather-boxes.
       this.#hideAllInLocationDiv()
+      this.#hideAllInWeatherData()
+
       this.#locationDataElement.classList.remove('hidden')
+      this.#weatherDataBoxes.classList.remove('hidden')
     }
 
     /**

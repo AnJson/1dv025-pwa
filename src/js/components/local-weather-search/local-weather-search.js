@@ -29,6 +29,7 @@ template.innerHTML = `
       width: 100%;
       font-size: 1.3em;
       font-family: sans-serif;
+      z-index: 100;
     }
 
     #cities > li {

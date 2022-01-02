@@ -69,7 +69,7 @@ template.innerHTML = `
       height: 2.5em;
       border-radius: 1em;
       margin-bottom: .5em;
-      margin-top: 1.6em;
+      margin-top: 1.1em;
       overflow: hidden;
     }
 
@@ -270,6 +270,12 @@ customElements.define('local-weather',
         this.#setCurrentLocation(event.detail.cityData)
         this.#showLocalWeather(event.detail.cityData)
       })
+
+      this.#myPositionIcon.addEventListener('click', event => {
+        event.stopPropagation()
+        this.#setLoadingState()
+        this.#askForLocation()
+      })
     }
 
     // TODO: Comment.
@@ -287,6 +293,7 @@ customElements.define('local-weather',
           navigator.geolocation.getCurrentPosition(position => {
             const longitude = position.coords.longitude
             const latitude = position.coords.latitude
+
             this.#setCurrentLocation({
               longitude,
               latitude
@@ -373,8 +380,7 @@ customElements.define('local-weather',
         this.#showWeatherResult(weatherData)
       } catch (error) {
         console.log(error)
-        this.#hideAllInLocationDiv()
-        this.#noResultElement.classList.remove('hidden')
+        this.#setNoResultsState()
       }
     }
 
@@ -389,13 +395,23 @@ customElements.define('local-weather',
     }
 
     /**
-     * Removes the loading-state of the app.
+     * Shows the weather-results.
      *
      */
-    #removeLoadingState () {
+    #setShowWeatherState () {
       // TODO: add support for weather-boxes.
       this.#hideAllInLocationDiv()
-      this.#skeletonLoaderElement.classList.remove('hidden')
+      this.#locationDataElement.classList.remove('hidden')
+    }
+
+    /**
+     * Reveal the no-results-state of the app.
+     *
+     */
+    #setNoResultsState () {
+      // TODO: add support for weather-boxes.
+      this.#hideAllInLocationDiv()
+      this.#noResultElement.classList.remove('hidden')
     }
 
     /**
@@ -407,7 +423,7 @@ customElements.define('local-weather',
       console.log(weather)
       this.#updateLocationText()
       // TODO: Set date and time. Set the forecast temperature wind etc.
-      this.#removeLoadingState()
+      this.#setShowWeatherState()
     }
 
     /**

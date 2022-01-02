@@ -24,8 +24,13 @@ template.innerHTML = `
 
     #content {
       position: relative;
-      padding: 0 1em 1em;
+      width: 100%;
+      padding: 0 1em 2em;
       box-sizing: border-box;
+    }
+
+    #location {
+      width: 100%;
     }
 
     #position-icon-wrapper {
@@ -94,11 +99,26 @@ template.innerHTML = `
       background-position: -315px 0, 0 0, 0px 190px, 50px 195px; 
       animation: loading 1.5s infinite;
     }
+    
+    #weather-data-box-wrapper {
+      display: flex;
+      justify-content: space-between;
+    }
 
-    @keyframes loading {  
-      to {
-        background-position: 315px 0, 0 0, 0 190px, 50px 195px;
-      }
+    .weather-data-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 60px;
+      min-width: 50px;
+      padding: 0 .8em;
+      border-radius: 3px;
+      background-color: var(--color-active-background);
+      color: var(--color-text);
+      font-size: 1.5em;
+      font-family: sans-serif;
+      font-weight: 600;
     }
 
     local-weather-search::part(input) {
@@ -109,25 +129,31 @@ template.innerHTML = `
     local-weather-search::part(input):focus {
       outline: none;
     }
-
+    
     local-weather-search::part(list) {
       background-color: var(--color-inactive-background);
       color: var(--color-text);
     }
-
+    
     #loader {
       height: 30em;
     }
-
+    
     #no-result {
       color: var(--color-text);
       font-family: sans-serif;
     }
-
+    
     .hidden {
       display: none !important;
     }
-  </style>
+
+    @keyframes loading {  
+      to {
+        background-position: 315px 0, 0 0, 0 190px, 50px 195px;
+      }
+    }
+    </style>
   <div id="main">
     <local-weather-search id="search"></local-weather-search>
     <div id="content">
@@ -148,6 +174,24 @@ template.innerHTML = `
         <h2 id="no-result" class="hidden">No results, try again...</h2>
       </div>
       <local-weather-illustration id="illustration"></local-weather-illustration>
+      <div id="weather-data">
+        <div id="weather-data-box-wrapper">
+          <div class="weather-data-box" id="data-temp">0.2c</div>
+          <div class="weather-data-box">
+            <div id="data-wind-strength">10 m/s</div>
+            <span id="wind-direction">^</span>
+          </div>
+          <div class="weather-data-box" id="data-rain">0.5 mm/h</div>
+        </div>
+        <!-- <div id="weather-data-boxes">
+          <div class="weather-data-box" id="data-temp">0.2c</div>
+          <div class="weather-data-box">
+            <div id="data-wind-strength">10 m/s</div>
+            <span id="wind-direction">^</span>
+          </div>
+          <div class="weather-data-box" id="data-rain">0.5 mm/h</div>
+        </div> -->
+      </div>
     </div>
   </div>
 `
@@ -171,13 +215,6 @@ customElements.define('local-weather',
      * @type {HTMLElement}
      */
     #searchElement
-
-    /**
-     * Div element holding the city-name and time for forecast.
-     *
-     * @type {HTMLElement}
-     */
-    #locationDataElement
 
     /**
      * Svg element to set to local geolocation.
@@ -208,6 +245,13 @@ customElements.define('local-weather',
     #locationElement
 
     /**
+     * Div element holding the city-name and time for forecast.
+     *
+     * @type {HTMLElement}
+     */
+    #locationDataElement
+
+    /**
      * Div to hold skeleton of locationElement, to illustrate loading.
      *
      * @type {HTMLElement}
@@ -220,6 +264,13 @@ customElements.define('local-weather',
      * @type {HTMLElement}
      */
     #noResultElement
+
+    /**
+     * Wrapper div for weather-data.
+     *
+     * @type {HTMLElement}
+     */
+    #weatherDataElement
 
     /**
      * Data of the current location, defaults to Stockholm.
@@ -252,6 +303,7 @@ customElements.define('local-weather',
       this.#dateElement = this.shadowRoot.querySelector('#date')
       this.#skeletonLoaderElement = this.shadowRoot.querySelector('#skeleton-location-data')
       this.#noResultElement = this.shadowRoot.querySelector('#no-result')
+      this.#weatherDataElement = this.shadowRoot.querySelector('#weather-data')
 
       this.#searchElement.addEventListener('input', event => {
         if (event.detail.value.length >= 4) {
@@ -479,6 +531,16 @@ customElements.define('local-weather',
      */
     #hideAllInLocationDiv () {
       for (const element of this.#locationElement.children) {
+        element.classList.add('hidden')
+      }
+    }
+
+    /**
+     * Hide all elements in weather-data div.
+     *
+     */
+    #hideAllInWeatherData () {
+      for (const element of this.#weatherDataElement.children) {
         element.classList.add('hidden')
       }
     }

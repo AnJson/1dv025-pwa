@@ -5,18 +5,20 @@ const template = document.createElement('template')
 template.innerHTML = `
   <style>
     :host {
-      display: flex;
-      justify-content: center;
+      display: block;
       width: 100%;
       font-size: 10px;
     }
 
     #canvas {
       width: 100%;
-      height: 200px;
+      height: 250px;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
   </style>
-  <canvas id="canvas"></canvas>
+  <canvas id="canvas" height="200px"></canvas>
 `
 
 customElements.define('local-weather-illustration',
@@ -45,7 +47,7 @@ customElements.define('local-weather-illustration',
      * @type {object}
      */
     #elements = {
-      sun: new Sun(10, 0.3, 30, 30, 70, 4, 3, 0, 0.1)
+      sun: new Sun(10, 0.3, 20, 30, 60, 4, 3, 0, 0.1)
     }
 
     /**

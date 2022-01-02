@@ -35,7 +35,7 @@ export class Sun extends WeatherIllustration {
    */
   drawAnimation (ctx) {
     ctx.beginPath()
-    ctx.arc(this.x, this.y, this.size, 0, (Math.PI * 2))
+    ctx.arc(this.x, this.y, this.size, 0, (Math.PI * 2), false)
     ctx.fillStyle = '#FFE000'
     ctx.fill()
 

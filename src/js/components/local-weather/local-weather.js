@@ -186,8 +186,8 @@ template.innerHTML = `
     <div id="content">
       <div id="location">
         <div id="location-data" class="hidden">
-          <h2 id="city-name">Stockholm</h2>
-          <h3 id="date">Thursday 6/1</h3>
+          <h2 id="city-name"></h2>
+          <h3 id="date"></h3>
           <div id="position-icon-wrapper">
             <svg id="my-position-icon">
               <use href="${svgUrl}#icon-location" />
@@ -530,7 +530,7 @@ customElements.define('local-weather',
       const now = Date.now()
       const latestForecasts = weatherData.filter(data => new Date(data.validTime.substring(0, 19)).getTime() < now)
       const mappedData = [latestForecasts.pop()].map(data => ({
-        time: data.validTime,
+        time: data.validTime.substring(0, 19),
         temp: data.parameters[10].values[0],
         windAngle: data.parameters[13].values[0],
         windSpeed: data.parameters[14].values[0],
@@ -580,12 +580,18 @@ customElements.define('local-weather',
      */
     #showWeatherResult (weather) {
       console.log(weather)
+      const weatherDate = new Date(weather.time)
+      const day = weatherDate.toLocaleDateString('en-EN', {
+        weekday: 'long'
+      })
+      const dateString = `${day} ${weatherDate.getDate()}/${weatherDate.getMonth() + 1} ${weatherDate.getHours().toString().padStart(2, '0')}:${weatherDate.getMinutes().toString().padStart(2, '0')}`
       this.#updateLocationText()
-      // TODO: Set date and time. Set the forecast temperature wind etc.
+      this.#dateElement.textContent = dateString
       this.#tempDataElement.textContent = `${weather.temp}°`
       this.#windDataElement.textContent = `${weather.windSpeed}m/s`
       this.#windDirectionIcon.style.transform = `rotate(${weather.windAngle}deg)`
       this.#rainDataElement.textContent = `${weather.rain} mm`
+      // TODO: set weather-symbol as attribute on weather illustration.
       this.#setShowWeatherState()
     }
 

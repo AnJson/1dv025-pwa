@@ -413,7 +413,10 @@ customElements.define('local-weather',
       })
     }
 
-    // TODO: Comment.
+    /**
+     * Ask user-client for geolocation.
+     *
+     */
     connectedCallback () {
       this.#askForLocation()
     }

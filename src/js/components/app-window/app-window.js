@@ -28,16 +28,22 @@ template.innerHTML = `
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 5em;
+      height: 4em;
       background-color: var(--color-inactive-background);
       box-sizing: border-box;
       padding: 0 1em;
-      color: var(--color-text);
       transition: all 300ms;
     }
 
     #header:hover {
       background-color: var(--color-active-background);
+    }
+
+    #title {
+      font-family: sans-serif;
+      font-size: 1.3em;
+      font-weight: 600;
+      color: var(--color-text);
     }
 
     #content {
@@ -84,7 +90,7 @@ template.innerHTML = `
     }
   </style>
   <div id="header">
-    <p>Title</p>
+    <p id="title">Title</p>
     <span id="close"></span>
   </div>
   <div id="content"><slot><my-loader></my-loader></slot></div>
@@ -153,6 +159,13 @@ customElements.define('app-window',
     #header
 
     /**
+     * The p-element to show the title in header.
+     *
+     * @type {HTMLElement}
+     */
+    #titleElement
+
+    /**
      * The span-element to close the window.
      *
      * @type {HTMLElement}
@@ -170,6 +183,7 @@ customElements.define('app-window',
         .appendChild(template.content.cloneNode(true))
 
       this.#header = this.shadowRoot.querySelector('#header')
+      this.#titleElement = this.shadowRoot.querySelector('#title')
       this.#closeWindow = this.shadowRoot.querySelector('#close')
 
       this.#closeWindow.addEventListener('click', event => {
@@ -211,6 +225,32 @@ customElements.define('app-window',
 
       if (!this.hasAttribute('tabindex')) {
         this.setAttribute('tabindex', 0)
+      }
+    }
+
+    /**
+     * Attribute-names to observe and react on.
+     *
+     * @readonly
+     * @static
+     * @returns {string[]} - Array of attribute-names.
+     */
+    static get observedAttributes () {
+      return ['data-title']
+    }
+
+    /**
+     * React on attribute-changed.
+     *
+     * @param {string} name - Name of attribute.
+     * @param {string} oldVal - Attribute-value before change.
+     * @param {string} newVal - Attribute-value after change.
+     */
+    attributeChangedCallback (name, oldVal, newVal) {
+      if (oldVal !== newVal) {
+        if (name === 'data-title') {
+          this.#titleElement.textContent = newVal
+        }
       }
     }
 

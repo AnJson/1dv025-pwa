@@ -120,8 +120,8 @@ template.innerHTML = `
     <div id="desktop"></div>
     <div id="icon-bar">
       <div id="icon-container">
-        <app-icon data-target="memory-game"></app-icon>
-        <app-icon data-target="local-weather"></app-icon>
+        <app-icon data-target="memory-game" data-title="Memory"></app-icon>
+        <app-icon data-target="local-weather" data-title="Local Weather"></app-icon>
         <app-icon></app-icon>
       </div>
       <div id="info-bar">
@@ -229,6 +229,7 @@ customElements.define('desktop-app',
 
         if (event.detail.element) {
           const appWindow = this.#createAppWindow()
+          appWindow.setAttribute('data-title', event.detail.title)
           this.#desktopElement.appendChild(appWindow)
           const app = await this.#createCustomElement(event.detail.element)
           // If app was created successfully.

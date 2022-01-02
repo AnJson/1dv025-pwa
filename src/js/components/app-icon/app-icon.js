@@ -40,6 +40,13 @@ customElements.define('app-icon',
     #targetElement
 
     /**
+     * The title of the target-element to open on click.
+     *
+     * @type {string}
+     */
+    #targetTitle
+
+    /**
      * Create instance of class and attach open shadow-dom.
      *
      */
@@ -53,7 +60,8 @@ customElements.define('app-icon',
         this.dispatchEvent(new CustomEvent('icon-clicked', {
           bubbles: true,
           detail: {
-            element: this.#targetElement
+            element: this.#targetElement,
+            title: this.#targetTitle ? this.#targetTitle : 'Title'
           }
         }))
       })
@@ -67,7 +75,7 @@ customElements.define('app-icon',
      * @returns {string[]} - Array of attribute-names.
      */
     static get observedAttributes () {
-      return ['data-target']
+      return ['data-target', 'data-title']
     }
 
     /**
@@ -81,6 +89,10 @@ customElements.define('app-icon',
       if (oldVal !== newVal) {
         if (name === 'data-target') {
           this.#targetElement = newVal
+        }
+
+        if (name === 'data-title') {
+          this.#targetTitle = newVal
         }
       }
     }

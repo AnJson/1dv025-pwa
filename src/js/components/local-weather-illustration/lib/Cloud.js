@@ -13,12 +13,14 @@ export class Cloud extends WeatherIllustration {
    * @param {HTMLElement} image - Img-element of the cloud-image.
    * @param {number} width - Width of the image.
    * @param {number} height - Height of the image.
-   * @param {number} x - The position on the x-axis.
-   * @param {number} y - The position on the y-axis.
+   * @param {number} [x=0] - The position on the x-axis.
+   * @param {number} [y=0] - The position on the y-axis.
+   * @param {number} [dx=1] - The steps to take when moving on the x-axis.
+   * @param {number} [dy=1] - The steps to take when moving on the y-axis.
    * @memberof Cloud
    */
-  constructor (image, width, height, x, y) {
-    super(x, y)
+  constructor (image, width, height, x = 0, y = 0, dx = 1, dy = 1) {
+    super(x, y, dx, dy)
     this.width = width
     this.height = height
     this.image = image
@@ -34,7 +36,7 @@ export class Cloud extends WeatherIllustration {
   }
 
   /**
-   * Move the sun on the canvas.
+   * Move the cloud on the canvas.
    *
    * @param {HTMLElement} canvas - The canvas-element.
    * @returns {Promise} - A promise for positioning the element in the center of canvas.
@@ -42,14 +44,39 @@ export class Cloud extends WeatherIllustration {
   moveIn (canvas) {
     return new Promise(resolve => {
       /**
-       * Move the sun in on canvas.
+       * Move the cloud in on canvas.
        *
        * @returns {Promise} - A promise that is resolved.
        */
       const move = () => {
         this.step('right')
 
-        if (this.x >= canvas.width / 2) {
+        if (this.x >= (canvas.width / 2) - (this.width / 2)) {
+          return resolve()
+        }
+        requestAnimationFrame(move)
+      }
+
+      move()
+    })
+  }
+
+  /**
+   * Move the cloud off the canvas.
+   *
+   * @returns {Promise} - A promise for positioning the element outside of canvas.
+   */
+  moveOut () {
+    return new Promise(resolve => {
+      /**
+       * Move the cloud in on canvas.
+       *
+       * @returns {Promise} - A promise that is resolved.
+       */
+      const move = () => {
+        this.step('left')
+
+        if (this.x < (0 - this.width)) {
           return resolve()
         }
         requestAnimationFrame(move)

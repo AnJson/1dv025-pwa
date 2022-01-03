@@ -13,13 +13,13 @@ export class Sun extends WeatherIllustration {
    * @param {number} shadow - The shadow of the element.
    * @param {number} shadowSpeed - The speed of changing the alpha.
    * @param {number} size - The radius of the sun.
-   * @param {number} x - The position on the x-axis.
-   * @param {number} y - The position on the y-axis.
-   * @param {number} dx - The steps to take when moving on the x-axis.
-   * @param {number} dy - The steps to take when moving on the y-axis.
+   * @param {number} [x=0] - The position on the x-axis.
+   * @param {number} [y=0] - The position on the y-axis.
+   * @param {number} [dx=1] - The steps to take when moving on the x-axis.
+   * @param {number} [dy=1] - The steps to take when moving on the y-axis.
    * @memberof Sun
    */
-  constructor (shadow, shadowSpeed, size, x, y, dx, dy) {
+  constructor (shadow, shadowSpeed, size, x = 0, y = 0, dx = 1, dy = 1) {
     super(x, y, dx, dy)
     this.shadow = shadow
     this.shadowSpeed = shadowSpeed
@@ -63,6 +63,31 @@ export class Sun extends WeatherIllustration {
         this.step('right')
 
         if (this.x >= canvas.width / 2) {
+          return resolve()
+        }
+        requestAnimationFrame(move)
+      }
+
+      move()
+    })
+  }
+
+  /**
+   * Move the sun off the canvas.
+   *
+   * @returns {Promise} - A promise for positioning the element outside of canvas.
+   */
+  moveOut () {
+    return new Promise(resolve => {
+      /**
+       * Move the sun in on canvas.
+       *
+       * @returns {Promise} - A promise that is resolved.
+       */
+      const move = () => {
+        this.step('left')
+
+        if (this.x < (0 - (this.size * 2))) {
           return resolve()
         }
         requestAnimationFrame(move)

@@ -1,3 +1,5 @@
+import cloudImgUrl from './lib/cloud.png'
+import { Cloud } from './lib/Cloud.js'
 import { Sun } from './lib/Sun.js'
 
 const template = document.createElement('template')
@@ -46,16 +48,14 @@ customElements.define('local-weather-illustration',
      *
      * @type {object}
      */
-    #elements = {
-      sun: new Sun(10, 0.3, 20, -40, 60, 4, 3, 0, 0.1)
-    }
+    #elements = {}
 
     /**
      * An array of elements currently on display in canvas.
      *
      * @type {object[]}
      */
-    #elementsOnDisplay = [this.#elements.sun]
+    #elementsOnDisplay = [this.#elements.sun, this.#elements.cloud]
 
     /**
      * Create instance of class and attach open shadow-dom.
@@ -71,10 +71,17 @@ customElements.define('local-weather-illustration',
       this.#ctx = this.#canvas.getContext('2d')
     }
 
-    /* connectedCallback () {
-      this.#paintCanvas()
-      this.moveInElement(this.#elements.sun)
-    } */
+    connectedCallback () {
+      const cloudImg = document.createElement('img')
+      cloudImg.setAttribute('src', cloudImgUrl)
+
+      this.#elements = {
+        sun: new Sun(10, 0.3, 20, -40, 60, 4, 3, 0, 0.1),
+        cloud: new Cloud(cloudImg, 100, 60, -100, 90, 4, 3)
+      }
+
+      this.#elementsOnDisplay = [this.#elements.sun, this.#elements.cloud]
+    }
 
     /**
      * Attribute-names to observe and react on.
@@ -117,6 +124,7 @@ customElements.define('local-weather-illustration',
 
       this.#paintCanvas()
       this.moveInElement(this.#elements.sun)
+      this.moveInElement(this.#elements.cloud)
     }
 
     // TODO: Testing the animation. Remove this.

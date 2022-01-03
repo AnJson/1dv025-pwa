@@ -47,7 +47,7 @@ customElements.define('local-weather-illustration',
      * @type {object}
      */
     #elements = {
-      sun: new Sun(10, 0.3, 20, 30, 60, 4, 3, 0, 0.1)
+      sun: new Sun(10, 0.3, 20, -40, 60, 4, 3, 0, 0.1)
     }
 
     /**
@@ -71,8 +71,50 @@ customElements.define('local-weather-illustration',
       this.#ctx = this.#canvas.getContext('2d')
     }
 
-    connectedCallback () {
-      // TODO: Add test animations with timeout.
+    /* connectedCallback () {
+      this.#paintCanvas()
+      this.moveInElement(this.#elements.sun)
+    } */
+
+    /**
+     * Attribute-names to observe and react on.
+     *
+     * @readonly
+     * @static
+     * @returns {string[]} - Array of attribute-names.
+     */
+    static get observedAttributes () {
+      return ['data-symbol']
+    }
+
+    /**
+     * React on attribute-changed.
+     *
+     * @param {string} name - Name of attribute.
+     * @param {string} oldVal - Attribute-value before change.
+     * @param {string} newVal - Attribute-value after change.
+     */
+    attributeChangedCallback (name, oldVal, newVal) {
+      if (oldVal !== newVal) {
+        if (name === 'data-symbol') {
+          this.#showWeather(newVal)
+        }
+      }
+    }
+
+    /**
+     * Clear canvas from illustrations not needed to illustrate the new symbol, then bring in the illustrations needed.
+     *
+     * @param {string} symbol - Weather-symbol to illustrate.
+     */
+    #showWeather (symbol) {
+      const newSymbolSet = []
+
+      if (symbol === 'clear-sky') {
+        newSymbolSet.push(this.#elements.sun)
+      }
+      // Compare newSymbolSet with elements on display, remove and add.
+
       this.#paintCanvas()
       this.moveInElement(this.#elements.sun)
     }

@@ -598,7 +598,43 @@ customElements.define('local-weather',
       this.#windDirectionIcon.style.transform = `rotate(${weather.windAngle}deg)`
       this.#rainDataElement.textContent = `${weather.rain} mm`
       // TODO: set weather-symbol as attribute on weather illustration.
+      const weatherSymbol = this.#convertToSymbol(weather.symbol)
+      this.#illustration.setAttribute('data-symbol', 'clear-sky')
+      // this.#illustration.setAttribute('data-symbol', weatherSymbol)
+      console.log(weatherSymbol)
       this.#setShowWeatherState()
+    }
+
+    /**
+     * Convert weather symbol number to string.
+     *
+     * @param {number} num - Number representing weather-symbol from smhi api.
+     * @returns {string} - Name of weather-symbol.
+     */
+    #convertToSymbol (num) {
+      let symbol
+
+      if (num === 1 || num === 2) {
+        symbol = 'clear-sky'
+      }
+
+      if (num === 3 || num === 4) {
+        symbol = 'halfclear-sky'
+      }
+
+      if (num >= 5 && num <= 7) {
+        symbol = 'cloudy-sky'
+      }
+
+      if ((num >= 8 && num <= 14) || (num >= 18 && num <= 24)) {
+        symbol = 'rain'
+      }
+
+      if ((num >= 15 && num <= 17) || (num >= 25 && num <= 27)) {
+        symbol = 'snow'
+      }
+
+      return symbol
     }
 
     /**

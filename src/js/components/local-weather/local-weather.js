@@ -445,6 +445,9 @@ customElements.define('local-weather',
               longitude: this.#currentLocation.longitude,
               latitude: this.#currentLocation.latitude
             })
+          }, {
+            timeout: 5000,
+            maximumAge: 1800000
           })
         } catch (error) {
           console.log(error)

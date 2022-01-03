@@ -1,4 +1,5 @@
 import cloudImgUrl from './lib/cloud.png'
+import sunImgUrl from './lib/sun.png'
 import { Cloud } from './lib/Cloud.js'
 import { Sun } from './lib/Sun.js'
 
@@ -55,7 +56,7 @@ customElements.define('local-weather-illustration',
      *
      * @type {object[]}
      */
-    #elementsOnDisplay = [this.#elements.sun, this.#elements.cloud]
+    #elementsOnDisplay = [this.#elements.cloud, this.#elements.sun]
 
     /**
      * Create instance of class and attach open shadow-dom.
@@ -74,10 +75,12 @@ customElements.define('local-weather-illustration',
     connectedCallback () {
       const cloudImg = document.createElement('img')
       cloudImg.setAttribute('src', cloudImgUrl)
+      const sunImg = document.createElement('img')
+      sunImg.setAttribute('src', sunImgUrl)
 
       this.#elements = {
-        sun: new Sun(10, 0.3, 20, -40, 60, 4, 3, 0, 0.1),
-        cloud: new Cloud(cloudImg, 100, 60, -100, 90, 4, 3)
+        sun: new Sun(sunImg, 80, 80, -60, 20, 4, 3),
+        cloud: new Cloud(cloudImg, 100, 60, this.#canvas.width + 50, 40, 4, 3)
       }
 
       this.#elementsOnDisplay = [this.#elements.sun, this.#elements.cloud]
@@ -138,7 +141,6 @@ customElements.define('local-weather-illustration',
      */
     #paintCanvas () {
       this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height)
-
       for (const element of this.#elementsOnDisplay) {
         element.drawAnimation(this.#ctx)
       }

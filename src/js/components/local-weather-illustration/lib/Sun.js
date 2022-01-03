@@ -10,20 +10,20 @@ export class Sun extends WeatherIllustration {
   /**
    * Creates an instance of class.
    *
-   * @param {number} shadow - The shadow of the element.
-   * @param {number} shadowSpeed - The speed of changing the alpha.
-   * @param {number} size - The radius of the sun.
+   * @param {HTMLElement} image - Img-element of the sun-image.
+   * @param {number} width - Width of the image.
+   * @param {number} height - Height of the image.
    * @param {number} [x=0] - The position on the x-axis.
    * @param {number} [y=0] - The position on the y-axis.
    * @param {number} [dx=1] - The steps to take when moving on the x-axis.
    * @param {number} [dy=1] - The steps to take when moving on the y-axis.
    * @memberof Sun
    */
-  constructor (shadow, shadowSpeed, size, x = 0, y = 0, dx = 1, dy = 1) {
+  constructor (image, width, height, x = 0, y = 0, dx = 1, dy = 1) {
     super(x, y, dx, dy)
-    this.shadow = shadow
-    this.shadowSpeed = shadowSpeed
-    this.size = size
+    this.width = width
+    this.height = height
+    this.image = image
   }
 
   /**
@@ -32,18 +32,7 @@ export class Sun extends WeatherIllustration {
    * @param {object} ctx - The 2d context of the canvas.
    */
   drawAnimation (ctx) {
-    ctx.beginPath()
-    ctx.arc(this.x, this.y, this.size, 0, (Math.PI * 2), false)
-    ctx.fillStyle = '#FFE000'
-    ctx.fill()
-
-    ctx.shadowColor = '#FFE000'
-    this.shadow += this.shadowSpeed
-    ctx.shadowBlur = this.shadow
-
-    if (this.shadow > 25 || this.shadow < 8) {
-      this.shadowSpeed *= -1
-    }
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
   }
 
   /**
@@ -62,7 +51,7 @@ export class Sun extends WeatherIllustration {
       const move = () => {
         this.step('right')
 
-        if (this.x >= canvas.width / 2) {
+        if (this.x >= ((canvas.width / 2) - (this.width / 1.5))) {
           return resolve()
         }
         requestAnimationFrame(move)

@@ -49,9 +49,9 @@ export class Cloud extends WeatherIllustration {
        * @returns {Promise} - A promise that is resolved.
        */
       const move = () => {
-        this.step('right')
+        this.step('left')
 
-        if (this.x >= (canvas.width / 2) - (this.width / 2)) {
+        if (this.x <= (canvas.width / 2) - (this.width / 2)) {
           return resolve()
         }
         requestAnimationFrame(move)
@@ -64,9 +64,10 @@ export class Cloud extends WeatherIllustration {
   /**
    * Move the cloud off the canvas.
    *
+   * @param {HTMLElement} canvas - The canvas-element.
    * @returns {Promise} - A promise for positioning the element outside of canvas.
    */
-  moveOut () {
+  moveOut (canvas) {
     return new Promise(resolve => {
       /**
        * Move the cloud in on canvas.
@@ -74,9 +75,9 @@ export class Cloud extends WeatherIllustration {
        * @returns {Promise} - A promise that is resolved.
        */
       const move = () => {
-        this.step('left')
+        this.step('right')
 
-        if (this.x < (0 - this.width)) {
+        if (this.x > (canvas.width + this.width)) {
           return resolve()
         }
         requestAnimationFrame(move)

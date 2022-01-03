@@ -599,8 +599,7 @@ customElements.define('local-weather',
       this.#rainDataElement.textContent = `${weather.rain} mm`
       // TODO: set weather-symbol as attribute on weather illustration.
       const weatherSymbol = this.#convertToSymbol(weather.symbol)
-      this.#illustration.setAttribute('data-symbol', 'clear-sky')
-      // this.#illustration.setAttribute('data-symbol', weatherSymbol)
+      this.#illustration.setAttribute('data-symbol', weatherSymbol)
       console.log(weatherSymbol)
       this.#setShowWeatherState()
     }

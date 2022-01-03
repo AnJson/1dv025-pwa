@@ -1,49 +1,36 @@
 import { WeatherIllustration } from './WeatherIllustration.js'
 
 /**
- * Sun-element for canvas.
+ * Cloud-element for canvas.
  *
  * @augments WeatherIllustration
- * @class Sun
+ * @class Cloud
  */
-export class Sun extends WeatherIllustration {
+export class Cloud extends WeatherIllustration {
   /**
    * Creates an instance of class.
    *
-   * @param {number} shadow - The shadow of the element.
-   * @param {number} shadowSpeed - The speed of changing the alpha.
-   * @param {number} size - The radius of the sun.
+   * @param {HTMLElement} image - Img-element of the cloud-image.
+   * @param {number} width - Width of the image.
+   * @param {number} height - Height of the image.
    * @param {number} x - The position on the x-axis.
    * @param {number} y - The position on the y-axis.
-   * @param {number} dx - The steps to take when moving on the x-axis.
-   * @param {number} dy - The steps to take when moving on the y-axis.
-   * @memberof Sun
+   * @memberof Cloud
    */
-  constructor (shadow, shadowSpeed, size, x, y, dx, dy) {
-    super(x, y, dx, dy)
-    this.shadow = shadow
-    this.shadowSpeed = shadowSpeed
-    this.size = size
+  constructor (image, width, height, x, y) {
+    super(x, y)
+    this.width = width
+    this.height = height
+    this.image = image
   }
 
   /**
-   * Draw/animate sun on canvas.
+   * Draw/animate cloud on canvas.
    *
    * @param {object} ctx - The 2d context of the canvas.
    */
   drawAnimation (ctx) {
-    ctx.beginPath()
-    ctx.arc(this.x, this.y, this.size, 0, (Math.PI * 2), false)
-    ctx.fillStyle = '#FFE000'
-    ctx.fill()
-
-    ctx.shadowColor = '#FFE000'
-    this.shadow += this.shadowSpeed
-    ctx.shadowBlur = this.shadow
-
-    if (this.shadow > 25 || this.shadow < 8) {
-      this.shadowSpeed *= -1
-    }
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
   }
 
   /**

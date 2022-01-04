@@ -58,7 +58,7 @@ customElements.define('local-weather-illustration',
      *
      * @type {object[]}
      */
-    #elementsOnDisplay = [this.#elements.cloud, this.#elements.sun]
+    #elementsOnDisplay = []
 
     /**
      * Create instance of class and attach open shadow-dom.
@@ -94,6 +94,7 @@ customElements.define('local-weather-illustration',
         rain: new CanvasImage(rainImg, 80, 60, this.#canvas.width + 50, 80, 5.68, 4),
         snow: new CanvasImage(snowImg, 80, 60, this.#canvas.width + 50, 80, 5.68, 4)
       }
+      this.#elementsOnDisplay = [this.#elements.snow, this.#elements.sun]
     }
 
     /**
@@ -152,11 +153,11 @@ customElements.define('local-weather-illustration',
         newSymbolSet.push(this.#elements.cloud)
         newSymbolSet.push(this.#elements.snow)
       }
+
       // Compare newSymbolSet with elements on display, remove and add.
       const shouldGoOut = []
-
       for (const element of this.#elementsOnDisplay) {
-        if (!this.newSymbolSet.includes(element)) {
+        if (!newSymbolSet.includes(element)) {
           shouldGoOut.push(element)
         }
       }
@@ -168,15 +169,11 @@ customElements.define('local-weather-illustration',
         this.#elementsOnDisplay = newSymbolSet
       }
 
-      this.#paintCanvas()
       for (const element of this.#elementsOnDisplay) {
         element.moveIn(this.#canvas)
       }
 
-      /* this.moveInElement(this.#elements.sun)
-      this.moveInElement(this.#elements.cloud)
-      this.moveInElement(this.#elements.rain)
-      this.moveInElement(this.#elements.snow) */
+      this.#paintCanvas()
     }
 
     // TODO: Testing the animation. Remove this.
@@ -185,7 +182,8 @@ customElements.define('local-weather-illustration',
     }
 
     async #sendOutElements(elements) {
-      // Array of elements to return promise all on moveout.
+      // const moveOutPromises = elements.map(element => element.moveOut(this.#canvas))
+      return Promise.all(elements.map(element => element.moveOut(this.#canvas)))
     }
 
     /**
@@ -198,8 +196,8 @@ customElements.define('local-weather-illustration',
         element.drawAnimation(this.#ctx)
       }
 
-      if (this.#elementsOnDisplay.length) {
+      //if (this.#elementsOnDisplay.length) {
         requestAnimationFrame(this.#paintCanvas.bind(this))
-      }
+      //}
     }
   })

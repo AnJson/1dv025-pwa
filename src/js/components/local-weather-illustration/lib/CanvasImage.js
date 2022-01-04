@@ -49,12 +49,12 @@ export class CanvasImage extends WeatherIllustration {
        * @returns {Promise} - A promise that is resolved.
        */
       const move = () => {
-        this.step('left')
-
-        if (this.x <= (canvas.width / 2) - (this.width / 2)) {
+        if (this.x > (canvas.width / 2) - (this.width / 2)) {
+          this.step('left')
+          requestAnimationFrame(move)
+        } else {
           return resolve()
         }
-        requestAnimationFrame(move)
       }
 
       move()

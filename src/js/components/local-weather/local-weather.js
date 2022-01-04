@@ -585,7 +585,6 @@ customElements.define('local-weather',
      * @param {object} weather - Weather-forecast from smhi-api.
      */
     #showWeatherResult (weather) {
-      console.log(weather)
       const weatherDate = new Date(weather.time)
       const day = weatherDate.toLocaleDateString('en-EN', {
         weekday: 'long'
@@ -597,10 +596,8 @@ customElements.define('local-weather',
       this.#windDataElement.textContent = `${weather.windSpeed}m/s`
       this.#windDirectionIcon.style.transform = `rotate(${weather.windAngle}deg)`
       this.#rainDataElement.textContent = `${weather.rain} mm`
-      // TODO: set weather-symbol as attribute on weather illustration.
       const weatherSymbol = this.#convertToSymbol(weather.symbol)
       this.#illustration.setAttribute('data-symbol', weatherSymbol)
-      console.log(weatherSymbol)
       this.#setShowWeatherState()
     }
 

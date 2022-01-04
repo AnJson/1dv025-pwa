@@ -21,12 +21,12 @@ export class Sun extends CanvasImage {
        * @returns {Promise} - A promise that is resolved.
        */
       const move = () => {
-        this.step('right')
-
-        if (this.x >= ((canvas.width / 2) - (this.width / 1.5))) {
+        if (this.x < ((canvas.width / 2) - (this.width / 1.5))) {
+          this.step('right')
+          requestAnimationFrame(move)
+        } else {
           return resolve()
         }
-        requestAnimationFrame(move)
       }
 
       move()
@@ -48,7 +48,7 @@ export class Sun extends CanvasImage {
       const move = () => {
         this.step('left')
 
-        if (this.x < (0 - (this.size * 2))) {
+        if (this.x < (0 - this.width)) {
           return resolve()
         }
         requestAnimationFrame(move)

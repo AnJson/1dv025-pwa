@@ -161,6 +161,13 @@ customElements.define('desktop-app',
     #nextWindowY = 20
 
     /**
+     * The custom app-window element being dragged.
+     *
+     * @type {HTMLElement}
+     */
+    #windowDragging
+
+    /**
      * The div-element wrapping the application.
      *
      * @type {HTMLElement}
@@ -215,6 +222,26 @@ customElements.define('desktop-app',
 
       this.addEventListener('app-window-focused', event => {
         event.target.focus()
+      })
+
+      this.shadowRoot.addEventListener('app-window-header-mousedown', event => {
+        event.target.dragStart(event.detail.clientX, event.detail.clientY)
+        this.#windowDragging = event.target
+      })
+
+      this.addEventListener('mouseup', event => {
+        event.stopPropagation()
+        if (this.#windowDragging) {
+          this.#windowDragging.dragEnd(event.clientX, event.clientY)
+          this.#windowDragging = null
+        }
+      })
+
+      this.addEventListener('mousemove', event => {
+        event.stopPropagation()
+        if (this.#windowDragging) {
+          this.#windowDragging.drag(event.clientX, event.clientY)
+        }
       })
 
       this.shadowRoot.addEventListener('close-window', event => {

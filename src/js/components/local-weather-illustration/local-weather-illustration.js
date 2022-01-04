@@ -79,7 +79,7 @@ customElements.define('local-weather-illustration',
       sunImg.setAttribute('src', sunImgUrl)
 
       this.#elements = {
-        sun: new Sun(sunImg, 80, 80, -60, 20, 4, 3),
+        sun: new Sun(sunImg, 60, 60, -60, 25, 4, 3),
         cloud: new Cloud(cloudImg, 100, 60, this.#canvas.width + 50, 40, 4, 3)
       }
 

@@ -103,13 +103,6 @@ customElements.define('app-window',
    */
   class extends HTMLElement {
     /**
-     * The dragging-state of the element.
-     *
-     * @type {boolean}
-     */
-    #active = false
-
-    /**
      * The elements current position on x-axis.
      *
      * @type {number}
@@ -199,17 +192,13 @@ customElements.define('app-window',
       })
 
       this.#header.addEventListener('mousedown', event => {
-        this.#dragStart(event.clientX, event.clientY)
-      })
-
-      this.#header.addEventListener('mouseup', event => {
-        event.stopPropagation()
-        this.#dragEnd()
-      })
-
-      this.#header.addEventListener('mousemove', event => {
-        event.stopPropagation()
-        this.#drag(event.clientX, event.clientY)
+        this.dispatchEvent(new CustomEvent('app-window-header-mousedown', {
+          bubbles: true,
+          detail: {
+            clientX: event.clientX,
+            clientY: event.clientY
+          }
+        }))
       })
     }
 
@@ -283,22 +272,45 @@ customElements.define('app-window',
      * @param {number} x - The position of the cursor on x-axis.
      * @param {number} y - The position of the cursor on y-axis.
      */
-    #dragStart (x, y) {
+    dragStart (x, y) {
       this.#initialX = x - this.#xOffset
       this.#initialY = y - this.#yOffset
-
-      this.#active = true
     }
 
     /**
      * Stop the dragging-process.
      *
+     * @param {number} x - The position of the cursor on x-axis.
+     * @param {number} y - The position of the cursor on y-axis.
      */
-    #dragEnd () {
+    dragEnd (x, y) {
+      const rect = this.getBoundingClientRect()
+      if (rect.x < 0 || (rect.x + rect.width) > window.innerWidth || rect.y < 0 || (rect.y + rect.height) > window.innerHeight) {
+        if (rect.x < 0) {
+          this.#currentX = 0
+        }
+
+        if (rect.x + rect.width > window.innerWidth) {
+          this.#currentX = window.innerWidth - rect.width
+        }
+
+        if (rect.y < 0) {
+          this.#currentY = 0
+        }
+
+        if (rect.y + rect.height > window.innerHeight) {
+          this.#currentY = window.innerHeight - rect.height > 0 ? window.innerHeight - rect.height : 0
+        }
+      } else {
+        this.#currentX = x - this.#initialX
+        this.#currentY = y - this.#initialY
+      }
+
       this.#initialX = this.#currentX
       this.#initialY = this.#currentY
-
-      this.#active = false
+      this.#xOffset = this.#currentX
+      this.#yOffset = this.#currentY
+      this.#setPosition(this.#currentX, this.#currentY)
     }
 
     /**
@@ -307,15 +319,13 @@ customElements.define('app-window',
      * @param {number} x - The position of the cursor on x-axis.
      * @param {number} y - The position of the cursor on y-axis.
      */
-    #drag (x, y) {
-      if (this.#active) {
-        this.#currentX = x - this.#initialX
-        this.#currentY = y - this.#initialY
-        this.#xOffset = this.#currentX
-        this.#yOffset = this.#currentY
+    drag (x, y) {
+      this.#currentX = x - this.#initialX
+      this.#currentY = y - this.#initialY
+      this.#xOffset = this.#currentX
+      this.#yOffset = this.#currentY
 
-        this.#setPosition(this.#currentX, this.#currentY)
-      }
+      this.#setPosition(this.#currentX, this.#currentY)
     }
 
     /**

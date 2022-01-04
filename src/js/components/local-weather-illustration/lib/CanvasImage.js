@@ -1,23 +1,23 @@
 import { WeatherIllustration } from './WeatherIllustration.js'
 
 /**
- * Cloud-element for canvas.
+ * CanvasImage-element for canvas.
  *
  * @augments WeatherIllustration
- * @class Cloud
+ * @class CanvasImage
  */
-export class Cloud extends WeatherIllustration {
+export class CanvasImage extends WeatherIllustration {
   /**
    * Creates an instance of class.
    *
-   * @param {HTMLElement} image - Img-element of the cloud-image.
+   * @param {HTMLElement} image - Img-element.
    * @param {number} width - Width of the image.
    * @param {number} height - Height of the image.
    * @param {number} [x=0] - The position on the x-axis.
    * @param {number} [y=0] - The position on the y-axis.
    * @param {number} [dx=1] - The steps to take when moving on the x-axis.
    * @param {number} [dy=1] - The steps to take when moving on the y-axis.
-   * @memberof Cloud
+   * @memberof CanvasImage
    */
   constructor (image, width, height, x = 0, y = 0, dx = 1, dy = 1) {
     super(x, y, dx, dy)
@@ -27,7 +27,7 @@ export class Cloud extends WeatherIllustration {
   }
 
   /**
-   * Draw/animate cloud on canvas.
+   * Draw/animate canvas-image on canvas.
    *
    * @param {object} ctx - The 2d context of the canvas.
    */
@@ -36,7 +36,7 @@ export class Cloud extends WeatherIllustration {
   }
 
   /**
-   * Move the cloud on the canvas.
+   * Move the canvas-image on the canvas.
    *
    * @param {HTMLElement} canvas - The canvas-element.
    * @returns {Promise} - A promise for positioning the element in the center of canvas.
@@ -44,7 +44,7 @@ export class Cloud extends WeatherIllustration {
   moveIn (canvas) {
     return new Promise(resolve => {
       /**
-       * Move the cloud in on canvas.
+       * Move the canvas-image in on canvas.
        *
        * @returns {Promise} - A promise that is resolved.
        */
@@ -62,7 +62,7 @@ export class Cloud extends WeatherIllustration {
   }
 
   /**
-   * Move the cloud off the canvas.
+   * Move the canvas-image off the canvas.
    *
    * @param {HTMLElement} canvas - The canvas-element.
    * @returns {Promise} - A promise for positioning the element outside of canvas.
@@ -70,7 +70,7 @@ export class Cloud extends WeatherIllustration {
   moveOut (canvas) {
     return new Promise(resolve => {
       /**
-       * Move the cloud in on canvas.
+       * Move the canvas-image in on canvas.
        *
        * @returns {Promise} - A promise that is resolved.
        */

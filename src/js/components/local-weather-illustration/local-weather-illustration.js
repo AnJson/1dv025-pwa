@@ -1,6 +1,8 @@
 import cloudImgUrl from './lib/cloud.png'
 import sunImgUrl from './lib/sun.png'
-import { Cloud } from './lib/Cloud.js'
+import rainImgUrl from './lib/rain.png'
+import snowImgUrl from './lib/snow.png'
+import { CanvasImage } from './lib/CanvasImage.js'
 import { Sun } from './lib/Sun.js'
 
 const template = document.createElement('template')
@@ -72,18 +74,29 @@ customElements.define('local-weather-illustration',
       this.#ctx = this.#canvas.getContext('2d')
     }
 
+    /**
+     * Set up elements-field to contain elements available to draw on canvas.
+     *
+     */
     connectedCallback () {
       const cloudImg = document.createElement('img')
       cloudImg.setAttribute('src', cloudImgUrl)
       const sunImg = document.createElement('img')
       sunImg.setAttribute('src', sunImgUrl)
+      const rainImg = document.createElement('img')
+      rainImg.setAttribute('src', rainImgUrl)
+      const snowImg = document.createElement('img')
+      snowImg.setAttribute('src', snowImgUrl)
 
       this.#elements = {
         sun: new Sun(sunImg, 60, 60, -60, 25, 4, 3),
-        cloud: new Cloud(cloudImg, 100, 60, this.#canvas.width + 50, 40, 4, 3)
+        cloud: new CanvasImage(cloudImg, 100, 60, this.#canvas.width + 50, 40, 6, 4),
+        rain: new CanvasImage(rainImg, 80, 60, this.#canvas.width + 50, 80, 5.68, 4),
+        snow: new CanvasImage(snowImg, 80, 60, this.#canvas.width + 50, 80, 5.68, 4)
       }
 
-      this.#elementsOnDisplay = [this.#elements.sun, this.#elements.cloud]
+      // TODO: remove this.
+      this.#elementsOnDisplay = [this.#elements.snow, this.#elements.sun, this.#elements.cloud]
     }
 
     /**
@@ -123,11 +136,32 @@ customElements.define('local-weather-illustration',
       if (symbol === 'clear-sky') {
         newSymbolSet.push(this.#elements.sun)
       }
+
+      if (symbol === 'halfclear-sky') {
+        newSymbolSet.push(this.#elements.sun)
+        newSymbolSet.push(this.#elements.cloud)
+      }
+
+      if (symbol === 'cloudy-sky') {
+        newSymbolSet.push(this.#elements.cloud)
+      }
+
+      if (symbol === 'rain') {
+        newSymbolSet.push(this.#elements.cloud)
+        // newSymbolSet.push(this.#elements.cloud) TODO: Push in rain!
+      }
+
+      if (symbol === 'snow') {
+        newSymbolSet.push(this.#elements.cloud)
+        // newSymbolSet.push(this.#elements.cloud) TODO: Push in snow!
+      }
       // Compare newSymbolSet with elements on display, remove and add.
 
       this.#paintCanvas()
       this.moveInElement(this.#elements.sun)
       this.moveInElement(this.#elements.cloud)
+      this.moveInElement(this.#elements.rain)
+      this.moveInElement(this.#elements.snow)
     }
 
     // TODO: Testing the animation. Remove this.

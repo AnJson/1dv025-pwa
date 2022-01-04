@@ -94,7 +94,6 @@ customElements.define('local-weather-illustration',
         rain: new CanvasImage(rainImg, 80, 60, this.#canvas.width + 50, 80, 5.68, 4),
         snow: new CanvasImage(snowImg, 80, 60, this.#canvas.width + 50, 80, 5.68, 4)
       }
-      this.#elementsOnDisplay = [this.#elements.snow, this.#elements.sun]
     }
 
     /**
@@ -176,13 +175,13 @@ customElements.define('local-weather-illustration',
       this.#paintCanvas()
     }
 
-    // TODO: Testing the animation. Remove this.
-    async moveInElement (el) {
-      await el.moveIn(this.#canvas)
-    }
-
+    /**
+     * Move out elements from canvas.
+     *
+     * @param {object[]} elements - Array of elements to animate out of canvas.
+     * @returns {Promise} - A promise to make all elements leave canvas.
+     */
     async #sendOutElements(elements) {
-      // const moveOutPromises = elements.map(element => element.moveOut(this.#canvas))
       return Promise.all(elements.map(element => element.moveOut(this.#canvas)))
     }
 
@@ -196,8 +195,6 @@ customElements.define('local-weather-illustration',
         element.drawAnimation(this.#ctx)
       }
 
-      //if (this.#elementsOnDisplay.length) {
-        requestAnimationFrame(this.#paintCanvas.bind(this))
-      //}
+      requestAnimationFrame(this.#paintCanvas.bind(this))
     }
   })

@@ -122,7 +122,7 @@ template.innerHTML = `
       <div id="icon-container">
         <app-icon data-target="memory-game" data-title="Memory"></app-icon>
         <app-icon data-target="local-weather" data-title="Local Weather"></app-icon>
-        <app-icon></app-icon>
+        <app-icon data-target="chat-application" data-title="Chat Application"></app-icon>
       </div>
       <div id="info-bar">
         <div id="theme-mode">Dark/Light</div>

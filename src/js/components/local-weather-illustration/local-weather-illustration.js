@@ -94,9 +94,6 @@ customElements.define('local-weather-illustration',
         rain: new CanvasImage(rainImg, 80, 60, this.#canvas.width + 50, 80, 5.68, 4),
         snow: new CanvasImage(snowImg, 80, 60, this.#canvas.width + 50, 80, 5.68, 4)
       }
-
-      // TODO: remove this.
-      this.#elementsOnDisplay = [this.#elements.snow, this.#elements.sun, this.#elements.cloud]
     }
 
     /**
@@ -130,7 +127,7 @@ customElements.define('local-weather-illustration',
      *
      * @param {string} symbol - Weather-symbol to illustrate.
      */
-    #showWeather (symbol) {
+    async #showWeather (symbol) {
       const newSymbolSet = []
 
       if (symbol === 'clear-sky') {
@@ -148,25 +145,47 @@ customElements.define('local-weather-illustration',
 
       if (symbol === 'rain') {
         newSymbolSet.push(this.#elements.cloud)
-        // newSymbolSet.push(this.#elements.cloud) TODO: Push in rain!
+        newSymbolSet.push(this.#elements.rain)
       }
 
       if (symbol === 'snow') {
         newSymbolSet.push(this.#elements.cloud)
-        // newSymbolSet.push(this.#elements.cloud) TODO: Push in snow!
+        newSymbolSet.push(this.#elements.snow)
       }
       // Compare newSymbolSet with elements on display, remove and add.
+      const shouldGoOut = []
+
+      for (const element of this.#elementsOnDisplay) {
+        if (!this.newSymbolSet.includes(element)) {
+          shouldGoOut.push(element)
+        }
+      }
+
+      if (shouldGoOut.length > 0) {
+        await this.#sendOutElements(shouldGoOut)
+        this.#elementsOnDisplay = newSymbolSet
+      } else {
+        this.#elementsOnDisplay = newSymbolSet
+      }
 
       this.#paintCanvas()
-      this.moveInElement(this.#elements.sun)
+      for (const element of this.#elementsOnDisplay) {
+        element.moveIn(this.#canvas)
+      }
+
+      /* this.moveInElement(this.#elements.sun)
       this.moveInElement(this.#elements.cloud)
       this.moveInElement(this.#elements.rain)
-      this.moveInElement(this.#elements.snow)
+      this.moveInElement(this.#elements.snow) */
     }
 
     // TODO: Testing the animation. Remove this.
     async moveInElement (el) {
       await el.moveIn(this.#canvas)
+    }
+
+    async #sendOutElements(elements) {
+      // Array of elements to return promise all on moveout.
     }
 
     /**

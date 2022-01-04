@@ -301,12 +301,10 @@ customElements.define('desktop-app',
       // Lazy-load application by trying to import it, if import fails show error-message.
       try {
         await import(/* @vite-ignore */`../${elementName}/`)
+        return document.createElement(elementName)
       } catch {
-        await this.#showWarning(constants.ERROR_IMPORT)
-        return
+        this.#showWarning(constants.ERROR_IMPORT)
       }
-
-      return document.createElement(elementName)
     }
 
     /**

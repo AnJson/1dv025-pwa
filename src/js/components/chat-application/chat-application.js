@@ -1,4 +1,5 @@
 import * as constants from './lib/constants.js'
+import '../chat-nickname/'
 
 const template = document.createElement('template')
 
@@ -39,6 +40,65 @@ template.innerHTML = `
       box-sizing: border-box;
     }
 
+    #chat {
+      height: 350px;
+    }
+
+    #controls {
+      background-color: #000;
+      padding: 1em 0;
+      box-sizing: border-box;
+    }
+
+    #message-form {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      margin: 0;
+    }
+
+    #textarea {
+      resize: none;
+      font-family: sans-serif;
+      font-size: 1.3em;
+      color: var(--color-text);
+      background-color: var(--color-inactive-background);
+      border: none;
+      padding: .5em;
+      border-radius: 3px;
+    }
+
+    #textarea:focus {
+      outline: none;
+    }
+
+    #send-button {
+      border: none;
+      border-radius: 3px;
+      background-color: #FFE000;
+      box-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
+      padding: .7em 1.5em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 200ms;
+    }
+
+    #send-button:hover {
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, .6);
+    }
+
+    #send-button:disabled {
+      background-color: #eddb54;
+      cursor: default;
+    }
+
+    #send-button:disabled:hover {
+      box-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
+
+    }
+
     .hidden {
       display: none !important;
     }
@@ -47,12 +107,14 @@ template.innerHTML = `
     <div id="chat-container" class="hidden">
       <div id="chat-banner" class="hidden"></div>
       <div id="chat"></div>
+      <div id="controls">
+        <form id="message-form">
+          <textarea id="textarea" placeholder="Write your message..." rows="4" cols="30"></textarea>
+          <button id="send-button">Send</button>
+        </form>
+      </div>
     </div>
-    <div id="nickname">
-      <form id="nickname-form">
-        <!-- TODO: continue -->
-      </form>
-    </div>
+    <chat-nickname id="nickname"></chat-nickname>
   </div>
 `
 
@@ -119,6 +181,11 @@ customElements.define('chat-application',
       this.#chatElement = this.shadowRoot.querySelector('#chat')
       this.#chatBanner = this.shadowRoot.querySelector('#chat-banner')
       this.#nicknameElement = this.shadowRoot.querySelector('#nickname')
+
+      this.#nicknameElement.addEventListener('nickname-button-clicked', event => {
+        event.stopPropagation()
+        this.#enteredNicknameHandler(event.detail.nickname)
+      })
     }
 
     /**
@@ -184,6 +251,16 @@ customElements.define('chat-application',
       }
 
       this.#websocket.send(JSON.stringify(data))
+    }
+
+    /**
+     * Save nickname to localStorage and init chat.
+     *
+     * @param {string} nickname - Nickname string.
+     */
+    #enteredNicknameHandler (nickname) {
+      window.localStorage.setItem('chatapp-nickname', nickname)
+      this.#initChat()
     }
 
     /**

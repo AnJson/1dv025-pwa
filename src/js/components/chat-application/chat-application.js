@@ -22,6 +22,7 @@ template.innerHTML = `
 
     #chat-container {
       position: relative;
+      width: 100%;
     }
 
     #chat-banner {
@@ -29,10 +30,13 @@ template.innerHTML = `
       top: 0;
       left: 0;
       width: 100%;
-      padding: .7em 0;
-      /*
-      TODO: continue here.
-      */
+      padding: 10px;
+      background-color: var(--color-extra-light);
+      z-index: 100;
+      color: var(--color-text);
+      font-family: sans-serif;
+      font-size: 1.2em;
+      box-sizing: border-box;
     }
 
     .hidden {
@@ -40,11 +44,15 @@ template.innerHTML = `
     }
   </style>
   <div id="main">
-    <div id="chat-container">
-      <div id="chat-banner">This is the banner</div>
+    <div id="chat-container" class="hidden">
+      <div id="chat-banner" class="hidden"></div>
       <div id="chat"></div>
     </div>
-    <div id="nickname"></div>
+    <div id="nickname">
+      <form id="nickname-form">
+        <!-- TODO: continue -->
+      </form>
+    </div>
   </div>
 `
 
@@ -83,6 +91,13 @@ customElements.define('chat-application',
     #chatElement
 
     /**
+     * The div-element acting as banner to display connection-status.
+     *
+     * @type {HTMLElement}
+     */
+    #chatBanner
+
+    /**
      * The div element holding nickname-form.
      *
      * @type {HTMLElement}
@@ -101,12 +116,13 @@ customElements.define('chat-application',
 
       this.#mainElement = this.shadowRoot.querySelector('#main')
       this.#chatContainerElement = this.shadowRoot.querySelector('#chat-container')
-      this.#chatElement = this.shadowRoot.querySelector('#chat') // NOTE: Needed???
+      this.#chatElement = this.shadowRoot.querySelector('#chat')
+      this.#chatBanner = this.shadowRoot.querySelector('#chat-banner')
       this.#nicknameElement = this.shadowRoot.querySelector('#nickname')
     }
 
     /**
-     * Ask user-client for geolocation.
+     * Check if nickname in localstorage, else ask for nickname before connecting to websocket and showing chat.
      *
      */
     connectedCallback () {
@@ -128,6 +144,8 @@ customElements.define('chat-application',
       try {
         this.#hideAllInMain()
         this.#chatContainerElement.classList.remove('hidden')
+        this.#chatBanner.textContent = 'Connecting...'
+        this.#chatBanner.classList.remove('hidden')
         this.#connect()
       } catch (error) {
         console.log(error)
@@ -140,24 +158,32 @@ customElements.define('chat-application',
      *
      */
     #connect () {
-      // test-data
-      const data = {
-        type: 'message',
-        data: 'Hello wss',
-        username: 'AndersJson',
-        key: constants.API_KEY
-      }
-
       this.#websocket = new WebSocket('wss://courselab.lnu.se/message-app/socket', 'chatApp')
 
       this.#websocket.addEventListener('open', event => {
         console.log(event)
-        this.#websocket.send(JSON.stringify(data))
+        // TODO: Signal connected.
       })
 
       this.#websocket.addEventListener('message', event => {
         console.log(event.data)
       })
+    }
+
+    /**
+     * Send message to websocket.
+     *
+     * @param {string} message - Message-text to send.
+     */
+    #sendMessage (message) {
+      const data = {
+        type: 'message',
+        data: message,
+        username: window.localStorage.getItem('chatapp-nickname'),
+        key: constants.API_KEY
+      }
+
+      this.#websocket.send(JSON.stringify(data))
     }
 
     /**

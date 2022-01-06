@@ -1,4 +1,5 @@
 import * as constants from './lib/constants.js'
+import svgUrl from './lib/symbol-defs.svg'
 import '../chat-nickname/'
 
 const template = document.createElement('template')
@@ -56,12 +57,30 @@ template.innerHTML = `
       box-sizing: border-box;
     }
 
+    #nickname-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      margin-bottom: .5em;
+    }
+
     #nickname-text {
       margin: 0;
-      margin-bottom: .5em;
       font-family: sans-serif;
       color: var(--color-text);
       font-size: 1.2em;
+    }
+
+    #edit-nickname-icon {
+      width: 1.2em;
+      height: 1.2em;
+      fill: var(--color-inactive-text);
+      transition: all 200ms;
+      cursor: pointer;
+    }
+
+    #edit-nickname-icon:hover {
+      fill: var(--color-text);
     }
 
     #message-form {
@@ -123,9 +142,14 @@ template.innerHTML = `
       <div id="chat-banner" class="hidden"></div>
       <div id="chat"></div>
       <div id="controls">
-        <p id="nickname-text">Anders</p>
+        <div id="nickname-wrapper">
+          <p id="nickname-text">Anders</p>
+          <svg id="edit-nickname-icon">
+            <use href="${svgUrl}#icon-pencil" />
+          </svg>
+        </div>
         <form id="message-form">
-          <textarea id="textarea" placeholder="Write your message..." rows="4" cols="30"></textarea>
+          <textarea id="textarea" placeholder="Write your message..." rows="3" cols="31" disabled></textarea>
           <button id="send-button" disabled>Send</button>
         </form>
       </div>
@@ -190,6 +214,13 @@ customElements.define('chat-application',
     #nicknameTextElement
 
     /**
+     * The svg element to edit nickname.
+     *
+     * @type {HTMLElement}
+     */
+    #editNicknameIcon
+
+    /**
      * The nickname of this app-instance.
      *
      * @type {string}
@@ -226,6 +257,7 @@ customElements.define('chat-application',
       this.#chatBanner = this.shadowRoot.querySelector('#chat-banner')
       this.#nicknameElement = this.shadowRoot.querySelector('#nickname')
       this.#nicknameTextElement = this.shadowRoot.querySelector('#nickname-text')
+      this.#editNicknameIcon = this.shadowRoot.querySelector('#edit-nickname-icon')
       this.#chatTextarea = this.shadowRoot.querySelector('#textarea')
       this.#sendButtonElement = this.shadowRoot.querySelector('#send-button')
 
@@ -234,8 +266,15 @@ customElements.define('chat-application',
         this.#enteredNicknameHandler(event.detail.nickname)
       })
 
-      this.#chatTextarea.addEventListener('input', () => {
+      this.#chatTextarea.addEventListener('input', event => {
+        event.stopPropagation()
         this.#setSendButtonState()
+      })
+
+      this.#editNicknameIcon.addEventListener('click', event => {
+        event.stopPropagation()
+        this.#hideAllInMain()
+        this.#nicknameElement.classList.remove('hidden')
       })
     }
 
@@ -244,30 +283,43 @@ customElements.define('chat-application',
      *
      */
     connectedCallback () {
-      if (window.localStorage.getItem('chatapp-nickname')) {
+      const nickname = window.localStorage.getItem('chatapp-nickname')
+      if (nickname) {
+        this.#nicknameElement.setAttribute('data-nickname', nickname)
         this.#initChat()
       }
     }
 
     /**
-     * Close websocket connection.
+     * Close websocket connection and remove eventlisteners on socket.
      *
      */
     disconnectedCallback () {
       this.#websocket.close()
-      // TODO: remove eventlisteners.
+      this.#websocket.removeEventListener('open', this.#signalConnected)
+      // TODO: remove message-eventlistener.
+      this.#websocket = null
     }
 
+    /**
+     * Show chat-screen and if not connected, attempt to connect to websocket.
+     *
+     */
     #initChat () {
       try {
         this.#hideAllInMain()
+        this.#nicknameTextElement.textContent = window.localStorage.getItem('chatapp-nickname')
         this.#chatContainerElement.classList.remove('hidden')
-        this.#chatBanner.textContent = 'Connecting...'
-        this.#chatBanner.classList.remove('hidden')
-        this.#connect()
+        if (!this.#websocket) {
+          this.#chatBanner.textContent = 'Connecting...'
+          this.#chatBanner.classList.remove('hidden')
+          this.#connect()
+          this.#addEventListenersToWebsocket()
+        }
+        this.#chatTextarea.removeAttribute('disabled')
       } catch (error) {
         console.log(error)
-        // TODO: handle scenario when unnable to connect.
+        this.#chatBanner.textContent = 'Unable to connect, close the window and try again.'
       }
     }
 
@@ -276,16 +328,35 @@ customElements.define('chat-application',
      *
      */
     #connect () {
-      this.#websocket = new WebSocket('wss://courselab.lnu.se/message-app/socket', 'chatApp')
+      this.#websocket = new WebSocket(constants.WEBSOCKET_URL, constants.WEBSOCKET_PROTOCOL)
+    }
 
-      this.#websocket.addEventListener('open', event => {
-        console.log(event)
-        // TODO: Signal connected.
-      })
+    /**
+     * Add eventlisteners to connected websocket.
+     */
+    #addEventListenersToWebsocket () {
+      if (this.#websocket) {
+        this.#websocket.addEventListener('open', this.#signalConnected.bind(this))
 
-      this.#websocket.addEventListener('message', event => {
-        console.log(event.data)
-      })
+        this.#websocket.addEventListener('message', event => {
+          console.log(event.data)
+        })
+      }
+    }
+
+    /**
+     * Add eventlisteners to connected websocket.
+     */
+    #signalConnected () {
+      if (this.#chatBanner.classList.contains('hidden')) {
+        this.#chatBanner.classList.remove('hidden')
+      }
+
+      this.#chatBanner.textContent = 'Connected!'
+
+      setTimeout(() => {
+        this.#chatBanner.classList.add('hidden')
+      }, 2000)
     }
 
     /**
@@ -312,7 +383,7 @@ customElements.define('chat-application',
     #enteredNicknameHandler (nickname) {
       window.localStorage.setItem('chatapp-nickname', nickname)
       this.#nickname = nickname
-      this.#nicknameTextElement.textContent = this.#nickname
+      this.#nicknameTextElement.textContent = window.localStorage.getItem('chatapp-nickname')
       this.#initChat()
     }
 

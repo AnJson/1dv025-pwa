@@ -167,6 +167,7 @@ customElements.define('chat-nickname',
       if (oldVal !== newVal) {
         if (name === 'data-nickname') {
           this.#nicknameInputElement.value = newVal
+          this.#disableButtonHandler()
         }
       }
     }

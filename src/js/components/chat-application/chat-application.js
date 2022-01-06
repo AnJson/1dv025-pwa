@@ -1,6 +1,7 @@
 import * as constants from './lib/constants.js'
 import svgUrl from './lib/symbol-defs.svg'
 import '../chat-nickname/'
+import '../chat-message/'
 
 const template = document.createElement('template')
 
@@ -46,6 +47,26 @@ template.innerHTML = `
 
     #chat {
       height: 100%;
+      padding: 1em;
+      box-sizing: border-box;
+    }
+
+    .row {
+      display: flex;
+      padding: .7em 0;
+      box-sizing: border-box;
+    }
+
+    .row > * {
+      max-width: 50%;
+    }
+
+    .row__left {
+      justify-content: flex-start;
+    }
+
+    .row__right {
+      justify-content: flex-end;
     }
 
     #controls {
@@ -228,6 +249,13 @@ customElements.define('chat-application',
     #nickname
 
     /**
+     * The form-element for chat-messages.
+     *
+     * @type {HTMLElement}
+     */
+    #chatMessageForm
+
+    /**
      * The textarea where to write chat-messages.
      *
      * @type {HTMLElement}
@@ -258,6 +286,7 @@ customElements.define('chat-application',
       this.#nicknameElement = this.shadowRoot.querySelector('#nickname')
       this.#nicknameTextElement = this.shadowRoot.querySelector('#nickname-text')
       this.#editNicknameIcon = this.shadowRoot.querySelector('#edit-nickname-icon')
+      this.#chatMessageForm = this.shadowRoot.querySelector('#message-form')
       this.#chatTextarea = this.shadowRoot.querySelector('#textarea')
       this.#sendButtonElement = this.shadowRoot.querySelector('#send-button')
 
@@ -276,6 +305,12 @@ customElements.define('chat-application',
         this.#hideAllInMain()
         this.#nicknameElement.classList.remove('hidden')
       })
+
+      this.#chatMessageForm.addEventListener('submit', event => {
+        event.stopPropagation()
+        event.preventDefault()
+        this.#sendMessageHandler()
+      })
     }
 
     /**
@@ -286,6 +321,7 @@ customElements.define('chat-application',
       const nickname = window.localStorage.getItem('chatapp-nickname')
       if (nickname) {
         this.#nicknameElement.setAttribute('data-nickname', nickname)
+        this.#nickname = nickname
         this.#initChat()
       }
     }
@@ -338,9 +374,7 @@ customElements.define('chat-application',
       if (this.#websocket) {
         this.#websocket.addEventListener('open', this.#signalConnected.bind(this))
 
-        this.#websocket.addEventListener('message', event => {
-          console.log(event.data)
-        })
+        this.#websocket.addEventListener('message', this.#messageRecievedHandler.bind(this))
       }
     }
 
@@ -363,11 +397,13 @@ customElements.define('chat-application',
      * Send message to websocket.
      *
      * @param {string} message - Message-text to send.
+     * @param {number} time - Timestamp for sending message.
      */
-    #sendMessage (message) {
+    #sendMessage (message, time) {
       const data = {
         type: 'message',
         data: message,
+        time: time,
         username: window.localStorage.getItem('chatapp-nickname'),
         key: constants.API_KEY
       }
@@ -401,6 +437,70 @@ customElements.define('chat-application',
           this.#sendButtonElement.toggleAttribute('disabled')
         }
       }
+    }
+
+    /**
+     * Format data and display recieved message in the chat.
+     *
+     * @param {object} event - Event-object from message-event on websocket.
+     */
+    #messageRecievedHandler (event) {
+      const eventData = JSON.parse(event.data)
+      if (eventData.type === 'message') {
+        const data = {
+          data: eventData.data,
+          time: eventData.time,
+          username: eventData.username
+        }
+
+        this.#addMessageToChat('left', data)
+      }
+    }
+
+    /**
+     * Send message to websocket and display it in the chat.
+     *
+     */
+    #sendMessageHandler () {
+      console.log(this.#nickname)
+      const message = this.#chatTextarea.value
+      const time = Date.now()
+      this.#sendMessage(message, time)
+
+      this.#addMessageToChat('right', {
+        data: message,
+        time: time,
+        username: this.#nickname
+      })
+
+      this.#chatTextarea.value = ''
+    }
+
+    /**
+     * Create elements and display message in chat.
+     *
+     * @param {string} side - The left/right side to place the chat-message on.
+     * @param {object} data - The chat-message.
+     */
+    #addMessageToChat (side, data) {
+      const messageElement = document.createElement('chat-message')
+      messageElement.textContent = data.data
+      messageElement.setMeta({
+        time: data.time,
+        username: data.username
+      })
+
+      const row = document.createElement('div')
+      row.classList.add('row')
+
+      if (side === 'left') {
+        row.classList.add('row__left')
+      } else if (side === 'right') {
+        row.classList.add('row__right')
+      }
+
+      row.appendChild(messageElement)
+      this.#chatElement.appendChild(row)
     }
 
     /**

@@ -16,14 +16,17 @@ template.innerHTML = `
       flex-direction: column;
       align-items: center;
       width: 40em;
-      min-height: 30em;
+      height: 60em;
       border-radius: 3px;
       background-color: var(--color-active-background);
     }
 
     #chat-container {
+      display: flex;
+      flex-direction: column;
       position: relative;
       width: 100%;
+      height: 100%;
     }
 
     #chat-banner {
@@ -41,13 +44,24 @@ template.innerHTML = `
     }
 
     #chat {
-      height: 350px;
+      height: 100%;
     }
 
     #controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
       background-color: #000;
-      padding: 1em 0;
+      padding: 1em;
       box-sizing: border-box;
+    }
+
+    #nickname-text {
+      margin: 0;
+      margin-bottom: .5em;
+      font-family: sans-serif;
+      color: var(--color-text);
+      font-size: 1.2em;
     }
 
     #message-form {
@@ -55,6 +69,7 @@ template.innerHTML = `
       align-items: center;
       justify-content: space-around;
       margin: 0;
+      width: 100%;
     }
 
     #textarea {
@@ -108,9 +123,10 @@ template.innerHTML = `
       <div id="chat-banner" class="hidden"></div>
       <div id="chat"></div>
       <div id="controls">
+        <p id="nickname-text">Anders</p>
         <form id="message-form">
           <textarea id="textarea" placeholder="Write your message..." rows="4" cols="30"></textarea>
-          <button id="send-button">Send</button>
+          <button id="send-button" disabled>Send</button>
         </form>
       </div>
     </div>
@@ -167,6 +183,34 @@ customElements.define('chat-application',
     #nicknameElement
 
     /**
+     * The p element showing the nickname of this app-instance.
+     *
+     * @type {HTMLElement}
+     */
+    #nicknameTextElement
+
+    /**
+     * The nickname of this app-instance.
+     *
+     * @type {string}
+     */
+    #nickname
+
+    /**
+     * The textarea where to write chat-messages.
+     *
+     * @type {HTMLElement}
+     */
+    #chatTextarea
+
+    /**
+     * The button-element to send chat-messages.
+     *
+     * @type {HTMLElement}
+     */
+    #sendButtonElement
+
+    /**
      * Create instance of class and attach open shadow-dom.
      *
      */
@@ -181,10 +225,17 @@ customElements.define('chat-application',
       this.#chatElement = this.shadowRoot.querySelector('#chat')
       this.#chatBanner = this.shadowRoot.querySelector('#chat-banner')
       this.#nicknameElement = this.shadowRoot.querySelector('#nickname')
+      this.#nicknameTextElement = this.shadowRoot.querySelector('#nickname-text')
+      this.#chatTextarea = this.shadowRoot.querySelector('#textarea')
+      this.#sendButtonElement = this.shadowRoot.querySelector('#send-button')
 
       this.#nicknameElement.addEventListener('nickname-button-clicked', event => {
         event.stopPropagation()
         this.#enteredNicknameHandler(event.detail.nickname)
+      })
+
+      this.#chatTextarea.addEventListener('input', () => {
+        this.#setSendButtonState()
       })
     }
 
@@ -260,7 +311,25 @@ customElements.define('chat-application',
      */
     #enteredNicknameHandler (nickname) {
       window.localStorage.setItem('chatapp-nickname', nickname)
+      this.#nickname = nickname
+      this.#nicknameTextElement.textContent = this.#nickname
       this.#initChat()
+    }
+
+    /**
+     * Check if valid input in textarea and enable/disable the send-icon.
+     *
+     */
+    #setSendButtonState () {
+      if (this.#chatTextarea.value.trim() !== '') {
+        if (this.#sendButtonElement.hasAttribute('disabled')) {
+          this.#sendButtonElement.toggleAttribute('disabled')
+        }
+      } else {
+        if (!this.#sendButtonElement.hasAttribute('disabled')) {
+          this.#sendButtonElement.toggleAttribute('disabled')
+        }
+      }
     }
 
     /**

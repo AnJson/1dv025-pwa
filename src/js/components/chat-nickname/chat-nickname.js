@@ -8,7 +8,7 @@ template.innerHTML = `
       justify-content: center;
       align-items: center;
       width: 100%;
-      height: 60em;
+      height: 100%;
       font-size: 10px;
     }
 

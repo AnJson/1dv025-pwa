@@ -2,6 +2,7 @@ import * as constants from './lib/constants.js'
 import svgUrl from './lib/symbol-defs.svg'
 import '../chat-nickname/'
 import '../chat-message/'
+import { nanoid } from 'nanoid'
 
 const template = document.createElement('template')
 
@@ -20,7 +21,6 @@ template.innerHTML = `
       width: 40em;
       height: 60em;
       border-radius: 3px;
-      background-color: var(--color-active-background);
     }
 
     #chat-container {
@@ -38,7 +38,7 @@ template.innerHTML = `
       width: 100%;
       padding: 10px;
       background-color: var(--color-extra-light);
-      z-index: 100;
+      z-index: 10;
       color: var(--color-text);
       font-family: sans-serif;
       font-size: 1.2em;
@@ -49,6 +49,21 @@ template.innerHTML = `
       height: 100%;
       padding: 1em;
       box-sizing: border-box;
+      overflow: auto;
+    }
+
+    #chat::-webkit-scrollbar {
+      width: 0.6em;
+    }
+
+    #chat::-webkit-scrollbar-track {
+      background-color: var(--color-active-background);
+    }
+
+    #chat::-webkit-scrollbar-thumb {
+      width: 0.6rem;
+      border-radius: 3px;
+      background-color: var(--color-highlight);
     }
 
     .row {
@@ -73,7 +88,7 @@ template.innerHTML = `
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      background-color: #000;
+      background-color: var(--color-active-background);
       padding: 1em;
       box-sizing: border-box;
     }
@@ -121,6 +136,12 @@ template.innerHTML = `
       border: none;
       padding: .5em;
       border-radius: 3px;
+      -ms-overflow-style: none;
+      scrollbar-width: none; 
+    }
+
+    #textarea::-webkit-scrollbar {
+      display: none;
     }
 
     #textarea:focus {
@@ -151,7 +172,10 @@ template.innerHTML = `
 
     #send-button:disabled:hover {
       box-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
+    }
 
+    #send-button:focus {
+      outline: none;
     }
 
     .hidden {
@@ -242,13 +266,6 @@ customElements.define('chat-application',
     #editNicknameIcon
 
     /**
-     * The nickname of this app-instance.
-     *
-     * @type {string}
-     */
-    #nickname
-
-    /**
      * The form-element for chat-messages.
      *
      * @type {HTMLElement}
@@ -268,6 +285,20 @@ customElements.define('chat-application',
      * @type {HTMLElement}
      */
     #sendButtonElement
+
+    /**
+     * The nickname of this app-instance.
+     *
+     * @type {string}
+     */
+    #nickname
+
+    /**
+     * Unique id for this app-instance.
+     *
+     * @type {string}
+     */
+    #instanceId
 
     /**
      * Create instance of class and attach open shadow-dom.
@@ -315,9 +346,11 @@ customElements.define('chat-application',
 
     /**
      * Check if nickname in localstorage, else ask for nickname before connecting to websocket and showing chat.
+     * Set unique id for this instance of the application.
      *
      */
     connectedCallback () {
+      this.#instanceId = nanoid()
       const nickname = window.localStorage.getItem('chatapp-nickname')
       if (nickname) {
         this.#nicknameElement.setAttribute('data-nickname', nickname)
@@ -404,7 +437,8 @@ customElements.define('chat-application',
         type: 'message',
         data: message,
         time: time,
-        username: window.localStorage.getItem('chatapp-nickname'),
+        username: this.#nickname,
+        id: this.#instanceId,
         key: constants.API_KEY
       }
 
@@ -445,8 +479,9 @@ customElements.define('chat-application',
      * @param {object} event - Event-object from message-event on websocket.
      */
     #messageRecievedHandler (event) {
+      console.log(event.data)
       const eventData = JSON.parse(event.data)
-      if (eventData.type === 'message') {
+      if (eventData.type === 'message' && eventData.id !== this.#instanceId) {
         const data = {
           data: eventData.data,
           time: eventData.time,
@@ -462,7 +497,6 @@ customElements.define('chat-application',
      *
      */
     #sendMessageHandler () {
-      console.log(this.#nickname)
       const message = this.#chatTextarea.value
       const time = Date.now()
       this.#sendMessage(message, time)
@@ -474,6 +508,8 @@ customElements.define('chat-application',
       })
 
       this.#chatTextarea.value = ''
+      this.#setSendButtonState()
+      this.#chatTextarea.focus()
     }
 
     /**

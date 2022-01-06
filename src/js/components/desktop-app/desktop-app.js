@@ -57,7 +57,7 @@ template.innerHTML = `
       box-sizing: border-box;
       padding: .5em 2em;
       background-color: var(--color-inactive-background);
-      z-index: 100;
+      z-index: 200;
     }
 
     #icon-container:hover > * {
@@ -86,9 +86,13 @@ template.innerHTML = `
       transition: all 300ms;
     }
 
+    app-window {
+      z-index: 100;
+    }
+
     app-window:focus {
       outline: none;
-      z-index: 10;
+      z-index: 1000;
     }
 
     #theme-mode {

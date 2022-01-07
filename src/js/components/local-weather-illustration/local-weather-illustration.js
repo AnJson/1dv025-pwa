@@ -191,6 +191,9 @@ customElements.define('local-weather-illustration',
      */
     #paintCanvas () {
       this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height)
+      this.#ctx.shadowColor = '#000'
+      this.#ctx.shadowBlur = 5
+
       for (const element of this.#elementsOnDisplay) {
         element.drawAnimation(this.#ctx)
       }

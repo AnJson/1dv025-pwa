@@ -138,7 +138,6 @@ template.innerHTML = `
             <use href="${svgUrl}#icon-shrink" />
           </svg>
         </div>
-        <div>Clock</div>
       </div>
     </div>
   </div>

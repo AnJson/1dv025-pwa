@@ -202,7 +202,7 @@ customElements.define('chat-application',
     disconnectedCallback () {
       this.#websocket.close()
       this.#websocket.removeEventListener('open', this.#signalConnected)
-      // TODO: remove message-eventlistener.
+      this.#websocket.removeEventListener('message', this.#messageRecievedHandler)
       this.#websocket = null
     }
 

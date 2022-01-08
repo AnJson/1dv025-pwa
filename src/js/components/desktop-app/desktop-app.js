@@ -274,14 +274,6 @@ customElements.define('desktop-app',
           svg.classList.toggle('hidden')
         }
       })
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.addEventListener('message', event => {
-          console.log('listened!!!!!!')
-          console.log(event.data)
-          // TODO: Fix offline-handler.
-        })
-      }
     }
 
     /**

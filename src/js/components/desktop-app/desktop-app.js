@@ -274,6 +274,13 @@ customElements.define('desktop-app',
           svg.classList.toggle('hidden')
         }
       })
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', event => {
+          console.log(event.data)
+          // TODO: Fix offline-handler.
+        })
+      }
     }
 
     /**

@@ -15,7 +15,7 @@ template.innerHTML = `
       flex-direction: column;
       align-items: center;
       width: 40em;
-      height: 60em;
+      height: 45em;
       border-radius: 3px;
     }
 

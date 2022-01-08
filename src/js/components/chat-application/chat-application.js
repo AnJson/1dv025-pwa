@@ -356,11 +356,13 @@ customElements.define('chat-application',
      * @param {object} data - The chat-message.
      */
     #addMessageToChat (side, data) {
+      const timestamp = data.time ? data.time : Date.now()
+
       const messageElement = document.createElement('chat-message')
       messageElement.textContent = data.data
       messageElement.setMeta({
-        time: data.time ? data.time : Date.now(),
-        username: data.username
+        time: typeof timestamp === 'number' ? timestamp : Date.now(),
+        username: data.username ? data.username : 'Unknown'
       })
 
       const row = document.createElement('div')
@@ -374,6 +376,7 @@ customElements.define('chat-application',
 
       row.appendChild(messageElement)
       this.#chatElement.appendChild(row)
+      this.#chatElement.scrollTop = this.#chatElement.scrollHeight // Scroll down to bottom of chat-div.
     }
 
     /**

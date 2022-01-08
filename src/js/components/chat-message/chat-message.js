@@ -24,6 +24,7 @@ template.innerHTML = `
     #message {
       font-size: 1.3em;
       white-space: pre-wrap;
+      overflow: hidden;
     }
   </style>
   <div id="wrapper">

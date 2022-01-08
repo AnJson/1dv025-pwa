@@ -277,6 +277,7 @@ customElements.define('desktop-app',
 
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', event => {
+          console.log('listened!!!!!!')
           console.log(event.data)
           // TODO: Fix offline-handler.
         })

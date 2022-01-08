@@ -316,7 +316,6 @@ customElements.define('chat-application',
      * @param {object} event - Event-object from message-event on websocket.
      */
     #messageRecievedHandler (event) {
-      console.log(event.data)
       const eventData = JSON.parse(event.data)
       if (eventData.type === 'message' && eventData.id !== this.#instanceId) {
         const data = {

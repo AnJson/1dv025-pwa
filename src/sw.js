@@ -68,29 +68,27 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-/**
- * When online, cache the objects to be used if offline.
- *
- * @param {*} request - The request.
- * @returns {*} - The return.
- */
+  /**
+   * When online, cache the objects to be used if offline.
+   *
+   * @param {*} request - The request.
+   * @returns {*} - The return.
+   */
   const cachedFetch = async (request) => {
     try {
       const response = await fetch(request)
-
       const cache = await self.caches.open(version)
-      cache.put(request, response.clone())
+      if (request.method !== 'POST') {
+        cache.put(request, response.clone())
+      }
 
       return response
     } catch {
-      console.info('ServiceWorker is serving cached result due to bad connection.')
-
-      // Tell client that client is offline.
-      event.waitUntil(sendConnectionStatusToClient(event.clientId, false))
-      // TODO: fix the sending-message part.
+      console.info('ServiceWorker: Serving cached result')
       return self.caches.match(request)
     }
   }
-
+  // TODO: Fix the online-status dynamic.
   event.respondWith(cachedFetch(event.request))
+  event.waitUntil(sendConnectionStatusToClient(event.clientId, false))
 })

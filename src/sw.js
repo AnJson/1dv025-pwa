@@ -80,12 +80,11 @@ self.addEventListener('fetch', event => {
       const response = await fetch(request)
       const cache = await self.caches.open(version)
 
-      // Cache request only if NOT remote request or POST-request.
-      if (!request.referrer || (request.referrer.includes('localhost:3000') && request.url.includes('localhost:3000'))) {
-        if (request.method !== 'POST') {
-          cache.put(request, response.clone())
-        }
+      // Cache request only if not POST-request.
+      if (request.method !== 'POST') {
+        cache.put(request, response.clone())
       }
+
       sendMessage(id, true)
       return response
     } catch {

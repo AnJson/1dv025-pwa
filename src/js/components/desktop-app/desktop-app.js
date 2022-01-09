@@ -44,6 +44,7 @@ template.innerHTML = `
       position: relative;
       background-color: green;
       height: 100%;
+      overflow: hidden;
     }
 
     #icon-bar {
@@ -92,7 +93,7 @@ template.innerHTML = `
 
     app-window:focus {
       outline: none;
-      z-index: 1000;
+      z-index: 150;
     }
 
     #theme-mode {

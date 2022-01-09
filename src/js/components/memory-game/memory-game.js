@@ -41,7 +41,7 @@ template.innerHTML = `
       align-items: center;
       justify-content: center;
       width: 60em;
-      height: 70em;
+      height: 60em;
     }
 
     .hidden {

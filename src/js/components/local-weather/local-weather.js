@@ -521,6 +521,7 @@ customElements.define('local-weather',
         const currentWeatherData = this.#filterWeatherData(weatherData.timeSeries)
         this.#showWeatherResult(currentWeatherData)
       } catch (error) {
+        console.log('No response')
         console.log(error)
         this.#setNoResultsState()
       }

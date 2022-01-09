@@ -41,9 +41,14 @@ self.addEventListener('fetch', event => {
     try {
       const response = await fetch(request)
       const cache = await self.caches.open(version)
-      if (request.method !== 'POST') {
-        cache.put(request, response.clone())
+
+      // Cache request only if NOT remote request or POST-request.
+      if (request.referrer.includes('localhost:3000') && request.url.includes('localhost:3000')) {
+        if (request.method !== 'POST') {
+          cache.put(request, response.clone())
+        }
       }
+
       return response
     } catch {
       console.info('ServiceWorker: Serving cached result')

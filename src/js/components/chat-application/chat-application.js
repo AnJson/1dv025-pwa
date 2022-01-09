@@ -208,6 +208,46 @@ customElements.define('chat-application',
     }
 
     /**
+     * Attribute-names to observe and react on.
+     *
+     * @readonly
+     * @static
+     * @returns {string[]} - Array of attribute-names.
+     */
+    static get observedAttributes () {
+      return ['offline']
+    }
+
+    /**
+     * React on attribute-changed.
+     *
+     * @param {string} name - Name of attribute.
+     * @param {string} oldVal - Attribute-value before change.
+     * @param {string} newVal - Attribute-value after change.
+     */
+    attributeChangedCallback (name, oldVal, newVal) {
+      if (oldVal !== newVal) {
+        if (name === 'offline') {
+          if (this.hasAttribute('offline')) {
+            // Add offline-message in banner.
+            // Disable textarea and submitbutton.
+            this.#chatTextarea.setAttribute('disabled', '')
+            this.#sendButtonElement.setAttribute('disabled', '')
+            this.#chatBanner.textContent = 'Lost connection...'
+            this.#chatBanner.classList.remove('hidden')
+          } else {
+            // Hide banner with offline-message.
+            // Enable textarea and submit-button.
+            this.#chatTextarea.removeAttribute('disabled')
+            this.#setSendButtonState()
+            this.#chatBanner.textContent = ''
+            this.#chatBanner.classList.add('hidden')
+          }
+        }
+      }
+    }
+
+    /**
      * Show chat-screen and if not connected, attempt to connect to websocket.
      *
      */

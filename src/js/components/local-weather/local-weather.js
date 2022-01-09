@@ -22,6 +22,16 @@ template.innerHTML = `
       box-sizing: border-box;
     }
 
+    #offline-message {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--color-extra-light);
+      color: var(--color-text);
+      font-family: sans-serif;
+      font-size: 1.2em;
+      box-sizing: border-box;
+    }
+
     #content {
       position: relative;
       width: 100%;
@@ -183,6 +193,7 @@ template.innerHTML = `
     </style>
   <div id="main">
     <local-weather-search id="search"></local-weather-search>
+    <div id="offline-message" class="hidden">Lost connection...</div>
     <div id="content">
       <div id="location">
         <div id="location-data" class="hidden">
@@ -250,6 +261,13 @@ customElements.define('local-weather',
      * @type {HTMLElement}
      */
     #searchElement
+
+    /**
+     * The div-element showing offline-message.
+     *
+     * @type {HTMLElement}
+     */
+    #offlineMessageElement
 
     /**
      * Svg element to set to local geolocation.
@@ -372,6 +390,7 @@ customElements.define('local-weather',
         .appendChild(template.content.cloneNode(true))
 
       this.#searchElement = this.shadowRoot.querySelector('#search')
+      this.#offlineMessageElement = this.shadowRoot.querySelector('#offline-message')
       this.#locationDataElement = this.shadowRoot.querySelector('#location-data')
       this.#locationElement = this.shadowRoot.querySelector('#location')
       this.#myPositionIcon = this.shadowRoot.querySelector('#my-position-icon')
@@ -408,8 +427,11 @@ customElements.define('local-weather',
 
       this.#myPositionIcon.addEventListener('click', event => {
         event.stopPropagation()
-        this.#setLoadingState()
-        this.#askForLocation()
+
+        if (!this.hasAttribute('offline')) {
+          this.#setLoadingState()
+          this.#askForLocation()
+        }
       })
     }
 
@@ -418,7 +440,43 @@ customElements.define('local-weather',
      *
      */
     connectedCallback () {
-      this.#askForLocation()
+      if (!this.hasAttribute('offline')) {
+        this.#askForLocation()
+      }
+    }
+
+    /**
+     * Attribute-names to observe and react on.
+     *
+     * @readonly
+     * @static
+     * @returns {string[]} - Array of attribute-names.
+     */
+    static get observedAttributes () {
+      return ['offline']
+    }
+
+    /**
+     * React on attribute-changed.
+     *
+     * @param {string} name - Name of attribute.
+     * @param {string} oldVal - Attribute-value before change.
+     * @param {string} newVal - Attribute-value after change.
+     */
+    attributeChangedCallback (name, oldVal, newVal) {
+      if (oldVal !== newVal) {
+        if (name === 'offline') {
+          if (this.hasAttribute('offline')) {
+            // Add offline-message and hide search.
+            this.#searchElement.classList.add('hidden')
+            this.#offlineMessageElement.classList.remove('hidden')
+          } else {
+            // Hide offline-message and display search.
+            this.#offlineMessageElement.classList.add('hidden')
+            this.#searchElement.classList.remove('hidden')
+          }
+        }
+      }
     }
 
     /**

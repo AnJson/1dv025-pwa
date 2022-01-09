@@ -36,8 +36,37 @@ const sendConnectionStatusToClient = async (id, status) => {
 // Public interface.
 // -------------------------------------------------
 
-self.addEventListener('install', () => {
+self.addEventListener('install', event => {
   console.info('ServiceWorker: Installed version ', version)
+
+  /**
+   * Cache assets when installing the service worker.
+   *
+   * @returns {Promise} Promise that resolves to undefined.
+   */
+  const cacheAssets = async () => {
+    const cache = await self.caches.open(version)
+    console.info('ServiceWorker: Caching Files')
+
+    return cache.addAll([
+      'index.html',
+      'css/styles.css',
+      'js/index.js',
+      'favicon.ico',
+      'js/components/app-icon/app-icon.js',
+      'js/components/app-icon/index.js',
+      'js/components/app-window/app-window.js',
+      'js/components/app-window/index.js',
+      'js/components/desktop-app/desktop-app.js',
+      'js/components/desktop-app/index.js',
+      'js/components/desktop-app/lib/constants.js',
+      'js/components/desktop-app/lib/symbol-defs.svg',
+      'js/components/my-loader/index.js',
+      'js/components/my-loader/my-loader.js'
+    ])
+  }
+
+  event.waitUntil(cacheAssets())
 })
 
 self.addEventListener('activate', event => {

@@ -151,6 +151,13 @@ customElements.define('desktop-app',
    */
   class extends HTMLElement {
     /**
+     * The online-state of the application.
+     *
+     * @type {boolean}
+     */
+    #onlineState = true
+
+    /**
      * The position on x-axis to open next app-window on.
      *
      * @type {number}
@@ -267,6 +274,11 @@ customElements.define('desktop-app',
           if (app) {
             appWindow.appendChild(app)
           }
+
+          // Check if in offline mode and then set offline-attribute on windows and applications not having it set, including this newly created window.
+          if (this.#onlineState === false) {
+            this.#setConnectionStatusAttribute(this.#onlineState)
+          }
         }
       })
 
@@ -278,9 +290,9 @@ customElements.define('desktop-app',
 
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.addEventListener('message', event => {
-          console.log('listen')
-          console.log(event.data)
-          // TODO: Fix offline-handler.
+          if (Object.keys(event.data).includes('online')) {
+            this.#connectionMessageHandler(event.data.online)
+          }
         })
       }
     }
@@ -328,6 +340,47 @@ customElements.define('desktop-app',
         this.requestFullscreen()
       } else {
         document.exitFullscreen()
+      }
+    }
+
+    /**
+     * Signal or remove offline based on online-status.
+     *
+     * @param {boolean} onlineStatus - The online-state.
+     */
+    #connectionMessageHandler (onlineStatus) {
+      if (onlineStatus === true) {
+        // Online.
+        if (!this.#onlineState) {
+          this.#onlineState = !this.#onlineState
+          this.#setConnectionStatusAttribute(onlineStatus)
+        }
+      } else if (onlineStatus === false) {
+        // Offline.
+        if (this.#onlineState) {
+          this.#onlineState = !this.#onlineState
+          this.#setConnectionStatusAttribute(onlineStatus)
+        }
+      }
+    }
+
+    /**
+     * Toggle the online-state of windows on desktop and applications in these windows.
+     *
+     * @param {boolean} isOnline - The new online-status.
+     */
+    #setConnectionStatusAttribute (isOnline) {
+      let windows
+
+      if (isOnline === true) {
+        windows = this.#desktopElement.querySelectorAll('app-window[offline]')
+      } else if (isOnline === false) {
+        windows = this.#desktopElement.querySelectorAll('app-window:not([offline]')
+      }
+
+      for (const window of windows) {
+        window.toggleAttribute('offline')
+        window.firstChild.toggleAttribute('offline')
       }
     }
 

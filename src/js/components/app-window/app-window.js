@@ -46,6 +46,15 @@ template.innerHTML = `
       color: var(--color-text);
     }
 
+    #offline-status {
+      margin-left: 10px;
+      font-family: sans-serif;
+      font-size: 1.3em;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--color-text);
+    }
+
     #content {
       height: 100%;
       background-color: var(--color-inactive-background);
@@ -88,9 +97,13 @@ template.innerHTML = `
       transform: rotate(-45deg);
       background-color: currentColor;
     }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
   <div id="header">
-    <p id="title">Title</p>
+    <p id="title">Title</p><span id="offline-status" class="hidden">(offline)</span>
     <span id="close"></span>
   </div>
   <div id="content"><slot><my-loader></my-loader></slot></div>
@@ -159,6 +172,13 @@ customElements.define('app-window',
     #titleElement
 
     /**
+     * The span-element to signal offline.
+     *
+     * @type {HTMLElement}
+     */
+    #offlineStatusElement
+
+    /**
      * The span-element to close the window.
      *
      * @type {HTMLElement}
@@ -177,6 +197,7 @@ customElements.define('app-window',
 
       this.#header = this.shadowRoot.querySelector('#header')
       this.#titleElement = this.shadowRoot.querySelector('#title')
+      this.#offlineStatusElement = this.shadowRoot.querySelector('#offline-status')
       this.#closeWindow = this.shadowRoot.querySelector('#close')
 
       this.#closeWindow.addEventListener('click', event => {
@@ -225,7 +246,7 @@ customElements.define('app-window',
      * @returns {string[]} - Array of attribute-names.
      */
     static get observedAttributes () {
-      return ['data-title']
+      return ['data-title', 'offline']
     }
 
     /**
@@ -239,6 +260,16 @@ customElements.define('app-window',
       if (oldVal !== newVal) {
         if (name === 'data-title') {
           this.#titleElement.textContent = newVal
+        }
+
+        if (name === 'offline') {
+          if (this.hasAttribute('offline')) {
+            // Add offline-text to header.
+            this.#offlineStatusElement.classList.remove('hidden')
+          } else {
+            // Remove offline-text from header.
+            this.#offlineStatusElement.classList.add('hidden')
+          }
         }
       }
     }

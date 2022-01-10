@@ -23,14 +23,14 @@ template.innerHTML = `
       height: 100vh;
       font-size: 10px;
       overflow: hidden;
-      --color-inactive-text: rgb(62, 62, 63);
-      --color-inactive-background: rgba(250, 248, 243, 0.97);
-      --color-inactive-background-light: rgba(250, 248, 243, 0.30);
-      --color-active-background: rgb(255, 250, 247);
-      --color-highlight: rgba(181, 40, 24, 0.9);
+      --color-inactive-text: rgb(137, 137, 146);
+      --color-inactive-background: rgba(222, 224, 247, 0.9);
+      --color-inactive-background-light: rgba(222, 224, 247, 0.3);
+      --color-active-background: rgb(214, 216, 248);
+      --color-highlight: rgba(35, 118, 208, 0.9);
       --color-text: rgb(22, 22, 28);
-      --color-extra-light: rgba(107, 16, 6, 0.9);
-      --color-extra-dark: rgba(73, 17, 11, 0.9);
+      --color-extra-light: rgba(30, 92, 158, 0.9);
+      --color-extra-dark: rgba(14, 54, 97, 0.9);
     }
 
     #app.dark-mode {
@@ -82,6 +82,7 @@ template.innerHTML = `
     #info-bar {
       font-size: 2em;
       display: flex;
+      align-items: center;
       gap: 1em;
     }
 
@@ -104,7 +105,21 @@ template.innerHTML = `
     }
 
     #theme-mode {
+      padding: 10px 10px;
+      border: 2px solid var(--color-inactive-text);
+      color: var(--color-inactive-text);
+      font-size: 12px;
+      font-family: sans-serif;
+      text-transform: lowercase;
+      box-sizing: border-box;
       cursor: pointer;
+      border-radius: 3px;
+      transition: all 200ms;
+    }
+
+    #theme-mode:hover {
+      color: var(--color-text);
+      background-color: var(--color-inactive-text);
     }
 
     #full-screen {
@@ -143,7 +158,7 @@ template.innerHTML = `
         </app-icon>
       </div>
       <div id="info-bar">
-        <div id="theme-mode">Dark/Light</div>
+        <div id="theme-mode">Light-mode</div>
         <div id="full-screen">
           <svg class="full-screen-icon">
             <use href="${svgUrl}#icon-enlarge" />
@@ -213,7 +228,7 @@ customElements.define('desktop-app',
     #fullScreenToggleElement
 
     /**
-     * The div-element holding the theme-mode svg-icons.
+     * The div-element for theme-toggeling.
      *
      * @type {HTMLElement}
      */
@@ -403,6 +418,7 @@ customElements.define('desktop-app',
      */
     #toggleThemeHandler () {
       this.#appElement.classList.toggle('dark-mode')
+      this.#appElement.classList.contains('dark-mode') ? this.#themeToggleElement.textContent = 'light-theme' : this.#themeToggleElement.textContent = 'dark-theme'
     }
 
     /**

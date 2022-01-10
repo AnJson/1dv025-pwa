@@ -3,19 +3,13 @@ const template = document.createElement('template')
 template.innerHTML = `
   <style>
     :host {
-      display: block;
-      font-size: 10px;
-      cursor: pointer;
-    }
-
-    #icon {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 7em;
-      height: 7em;
-      border-radius: 50%;
-      background-color: white;
+      width: 5em;
+      height: 5em;
+      font-size: 10px;
+      cursor: pointer;
     }
 
     ::slotted(*) {
@@ -23,7 +17,7 @@ template.innerHTML = `
       max-height: 100%;
     }
   </style>
-  <div id="icon" part="icon"><slot>Icon</slot></div>
+  <slot>Icon</slot>
 `
 
 customElements.define('app-icon',

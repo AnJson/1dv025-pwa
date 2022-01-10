@@ -1,5 +1,9 @@
 import '../app-window/'
 import '../app-icon/'
+import wallpaperUrl from './lib/wallpaper.jpg'
+import chatIconUrl from './lib/chat-icon.png'
+import weatherIconUrl from './lib/weather-icon.png'
+import memoryIconUrl from './lib/memory-icon.png'
 import svgUrl from './lib/symbol-defs.svg'
 import * as constants from './lib/constants.js'
 
@@ -21,6 +25,7 @@ template.innerHTML = `
       overflow: hidden;
       --color-inactive-text: rgb(62, 62, 63);
       --color-inactive-background: rgba(250, 248, 243, 0.97);
+      --color-inactive-background-light: rgba(250, 248, 243, 0.30);
       --color-active-background: rgb(255, 250, 247);
       --color-highlight: rgba(181, 40, 24, 0.9);
       --color-text: rgb(22, 22, 28);
@@ -31,6 +36,7 @@ template.innerHTML = `
     #app.dark-mode {
       --color-inactive-text: rgb(62, 62, 63);
       --color-inactive-background: rgba(30, 30, 31, 0.98);
+      --color-inactive-background-light: rgba(30, 30, 31, 0.30);
       --color-active-background: rgb(22, 22, 28);
       --color-highlight: rgba(181, 40, 24, 0.9);
       --color-text: rgb(229, 231, 237);
@@ -42,7 +48,8 @@ template.innerHTML = `
     #desktop {
       flex: 1;
       position: relative;
-      background-color: green;
+      background: linear-gradient(var(--color-inactive-background), var(--color-inactive-background-light)) ,
+                  center / cover no-repeat url("${wallpaperUrl}");
       height: 100%;
       overflow: hidden;
     }
@@ -57,7 +64,7 @@ template.innerHTML = `
       width: 100%;
       box-sizing: border-box;
       padding: .5em 2em;
-      background-color: var(--color-inactive-background);
+      background-color: var(--color-inactive-background-light);
       z-index: 200;
     }
 
@@ -125,9 +132,15 @@ template.innerHTML = `
     <div id="desktop"></div>
     <div id="icon-bar">
       <div id="icon-container">
-        <app-icon data-target="memory-game" data-title="Memory"></app-icon>
-        <app-icon data-target="local-weather" data-title="Local Weather"></app-icon>
-        <app-icon data-target="chat-application" data-title="Chat Application"></app-icon>
+        <app-icon data-target="memory-game" data-title="Memory">
+          <img src="${memoryIconUrl}" />
+        </app-icon>
+        <app-icon data-target="local-weather" data-title="Local Weather">
+          <img src="${weatherIconUrl}" />
+        </app-icon>
+        <app-icon data-target="chat-application" data-title="Chat Application">
+          <img src="${chatIconUrl}" />
+        </app-icon>
       </div>
       <div id="info-bar">
         <div id="theme-mode">Dark/Light</div>

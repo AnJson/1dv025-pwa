@@ -15,13 +15,13 @@ template.innerHTML = `
     h1 {
       font-family: sans-serif;
       font-weight: 600;
-      font-size: 8em;
+      font-size: 4em;
       margin-bottom: 1em;
       text-transform: uppercase;
       letter-spacing: 2px;
       color: #FFE000;
       text-shadow: 1px 1px 4px rgba(0, 0, 0, .9);
-      margin-top: 0;
+      margin: 0;
     }
 
     form {
@@ -85,9 +85,10 @@ template.innerHTML = `
       display: none !important;
     }
   </style>
+  <h1>Chat-App</h1>
   <form id="nickname-form" autocomplete="off">
     <label for="nickname-input">
-      <input type="text" id="nickname-input" />
+      <input type="text" id="nickname-input" placeholder="Enter nickname" />
     </label>
     <button id="submit-button" disabled>Chat</button>
   </form>

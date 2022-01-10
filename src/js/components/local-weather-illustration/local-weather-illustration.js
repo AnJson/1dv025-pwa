@@ -181,7 +181,7 @@ customElements.define('local-weather-illustration',
      * @param {object[]} elements - Array of elements to animate out of canvas.
      * @returns {Promise} - A promise to make all elements leave canvas.
      */
-    async #sendOutElements(elements) {
+    async #sendOutElements (elements) {
       return Promise.all(elements.map(element => element.moveOut(this.#canvas)))
     }
 

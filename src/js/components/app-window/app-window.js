@@ -33,6 +33,10 @@ template.innerHTML = `
       box-sizing: border-box;
       padding: 0 1em;
       transition: all 300ms;
+      user-select: none; /* supported by Chrome and Opera */
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
     }
 
     #header:hover {

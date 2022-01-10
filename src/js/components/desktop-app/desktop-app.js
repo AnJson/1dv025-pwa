@@ -65,7 +65,7 @@ template.innerHTML = `
       box-sizing: border-box;
       padding: .5em 2em;
       background-color: var(--color-inactive-background-light);
-      z-index: 200;
+      z-index: 50;
     }
 
     #icon-container:hover > * {

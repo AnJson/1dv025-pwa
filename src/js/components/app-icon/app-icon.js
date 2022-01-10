@@ -54,7 +54,7 @@ customElements.define('app-icon',
         this.dispatchEvent(new CustomEvent('icon-clicked', {
           bubbles: true,
           detail: {
-            element: this.#targetElement,
+            target: this.#targetElement,
             title: this.#targetTitle ? this.#targetTitle : 'Title'
           }
         }))

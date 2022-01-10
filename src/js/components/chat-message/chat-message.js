@@ -28,7 +28,7 @@ template.innerHTML = `
     }
   </style>
   <div id="wrapper">
-    <div id="meta">Anders 13:00</div>
+    <div id="meta"></div>
     <div id="message"><slot></slot></div>
   </div>
 `
@@ -47,13 +47,6 @@ customElements.define('chat-message',
     #metaElement
 
     /**
-     * The div-element holding message.
-     *
-     * @type {HTMLElement}
-     */
-    #messageElement
-
-    /**
      * Create instance of class and attach open shadow-dom.
      *
      */
@@ -64,7 +57,6 @@ customElements.define('chat-message',
         .appendChild(template.content.cloneNode(true))
 
       this.#metaElement = this.shadowRoot.querySelector('#meta')
-      this.#messageElement = this.shadowRoot.querySelector('#message')
     }
 
     /**

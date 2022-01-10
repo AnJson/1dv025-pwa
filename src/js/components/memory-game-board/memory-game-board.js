@@ -221,28 +221,6 @@ customElements.define('memory-game-board',
     }
 
     /**
-     * Set the cardsOnBoard field.
-     *
-     */
-    set cardsOnBoard (amount) {
-      if (!Number.isInteger(amount)) {
-        return
-      }
-
-      this.#cardsOnBoard = Number.parseInt(amount)
-    }
-
-    /**
-     * Get the cardsOnBoard-field.
-     *
-     * @readonly
-     * @returns {number} - The cardsOnBoard-field.
-     */
-    get cardsOnBoard () {
-      return Number.parseInt(this.#cardsOnBoard)
-    }
-
-    /**
      * Add cards to the board.
      *
      * @returns {HTMLElement} - The current instance.

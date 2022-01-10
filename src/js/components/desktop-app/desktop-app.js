@@ -106,8 +106,8 @@ template.innerHTML = `
 
     #theme-mode {
       padding: 10px 10px;
-      border: 2px solid var(--color-inactive-text);
-      color: var(--color-inactive-text);
+      border: 2px solid var(--color-inactive-background);
+      color: var(--color-inactive-background);
       font-size: 12px;
       font-family: sans-serif;
       text-transform: lowercase;
@@ -119,13 +119,13 @@ template.innerHTML = `
 
     #theme-mode:hover {
       color: var(--color-text);
-      background-color: var(--color-inactive-text);
+      background-color: var(--color-inactive-background);
     }
 
     #full-screen {
       cursor: pointer;
       font-size: 10px;
-      color: var(--color-inactive-text);
+      color: var(--color-inactive-background);
     }
 
     #full-screen:hover {
@@ -293,11 +293,11 @@ customElements.define('desktop-app',
       this.shadowRoot.addEventListener('icon-clicked', async event => {
         event.stopPropagation()
 
-        if (event.detail.element) {
+        if (event.detail.target) {
           const appWindow = this.#createAppWindow()
           appWindow.setAttribute('data-title', event.detail.title)
           this.#desktopElement.appendChild(appWindow)
-          const app = await this.#createCustomElement(event.detail.element)
+          const app = await this.#createCustomElement(event.detail.target)
           // If app was created successfully.
           if (app) {
             appWindow.appendChild(app)

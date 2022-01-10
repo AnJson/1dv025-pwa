@@ -80,10 +80,7 @@ self.addEventListener('fetch', event => {
       const response = await fetch(request)
       const cache = await self.caches.open(version)
 
-      // Cache request only if not POST-request.
-      if (request.method !== 'POST') {
-        cache.put(request, response.clone())
-      }
+      cache.put(request, response.clone())
 
       sendMessage(id, true)
       return response

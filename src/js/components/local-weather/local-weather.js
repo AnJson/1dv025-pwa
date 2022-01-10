@@ -270,16 +270,24 @@ customElements.define('local-weather',
           })
         } catch (error) {
           console.log(error)
+          try {
+            this.#showLocalWeather({
+              longitude: this.#currentLocation.longitude,
+              latitude: this.#currentLocation.latitude
+            })
+          } catch (error) {
+            console.log(error)
+          }
+        }
+      } else {
+        try {
           this.#showLocalWeather({
             longitude: this.#currentLocation.longitude,
             latitude: this.#currentLocation.latitude
           })
+        } catch (error) {
+          console.log(error)
         }
-      } else {
-        this.#showLocalWeather({
-          longitude: this.#currentLocation.longitude,
-          latitude: this.#currentLocation.latitude
-        })
       }
     }
 

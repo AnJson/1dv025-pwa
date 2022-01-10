@@ -274,7 +274,11 @@ customElements.define('chat-application',
      *
      */
     #connect () {
-      this.#websocket = new WebSocket(constants.WEBSOCKET_URL, constants.WEBSOCKET_PROTOCOL)
+      try {
+        this.#websocket = new WebSocket(constants.WEBSOCKET_URL, constants.WEBSOCKET_PROTOCOL)
+      } catch (error) {
+        console.log(error)
+      }
     }
 
     /**

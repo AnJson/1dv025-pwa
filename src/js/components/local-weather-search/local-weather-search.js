@@ -104,6 +104,7 @@ customElements.define('local-weather-search',
             latitude: event.target.getAttribute('data-lat')
           }
           this.#citySelectedHandler(data)
+          this.#inputField.value = ''
         }
         this.clearResults()
       })

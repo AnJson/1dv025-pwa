@@ -217,7 +217,8 @@ customElements.define('memory-game',
       this.#hideAllSectionsInContainer(this.#mainElement)
       this.#hideAllSectionsInContainer(this.#headerElement)
       this.#updateHighscore()
-      this.#highscoreElement.displayHighscore(this.#level)
+      const highscore = window.localStorage.getItem(`mymemory-highscore-${this.#level}`) ? JSON.parse(window.localStorage.getItem(`mymemory-highscore-${this.#level}`)) : undefined
+      this.#highscoreElement.displayHighscore(this.#level, highscore)
       this.#highscoreElement.classList.remove('hidden')
     }
 

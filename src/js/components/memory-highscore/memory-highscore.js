@@ -134,10 +134,9 @@ customElements.define('memory-highscore',
      * Get highscore for the current level from localstorage and show it.
      *
      * @param {string} level - Hard, medium, easy.
+     * @param {object[]} highscore - Highscore from localstorage.
      */
-    displayHighscore (level) {
-      const highscore = this.#getHighscore(level)
-
+    displayHighscore (level, highscore) {
       if (highscore) {
         this.#clearHighscoreTable()
         this.#showHighscoreTable(highscore)
@@ -145,18 +144,6 @@ customElements.define('memory-highscore',
       } else {
         this.#highscoreList.textContent = `No highscores for level ${level}.`
       }
-    }
-
-    /**
-     * Gets the highscore from local-storage.
-     *
-     * @param {string} level - The game-play level to show highscore for.
-     * @returns {JSON} - Data from local-storage.
-     */
-    #getHighscore (level) {
-      const highscore = window.localStorage.getItem(`mymemory-highscore-${level}`)
-
-      return JSON.parse(highscore)
     }
 
     /**

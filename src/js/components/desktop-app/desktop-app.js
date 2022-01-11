@@ -292,21 +292,21 @@ customElements.define('desktop-app',
 
       this.shadowRoot.addEventListener('icon-clicked', async event => {
         event.stopPropagation()
+        const target = event.target.getAttribute('data-target')
+        const title = event.target.getAttribute('data-title')
 
-        if (event.detail.target) {
-          const appWindow = this.#createAppWindow()
-          appWindow.setAttribute('data-title', event.detail.title)
-          this.#desktopElement.appendChild(appWindow)
-          const app = await this.#createCustomElement(event.detail.target)
-          // If app was created successfully.
-          if (app) {
-            appWindow.appendChild(app)
-          }
+        const appWindow = this.#createAppWindow()
+        appWindow.setAttribute('data-title', title)
+        this.#desktopElement.appendChild(appWindow)
+        const app = await this.#createCustomElement(target)
+        // If app was created successfully.
+        if (app) {
+          appWindow.appendChild(app)
+        }
 
-          // Check if in offline mode and then set offline-attribute on windows and applications not having it set, including this newly created window.
-          if (this.#onlineState === false) {
-            this.#setConnectionStatusAttribute(this.#onlineState)
-          }
+        // Check if in offline mode and then set offline-attribute on windows and applications not having it set, including this newly created window.
+        if (this.#onlineState === false) {
+          this.#setConnectionStatusAttribute(this.#onlineState)
         }
       })
 

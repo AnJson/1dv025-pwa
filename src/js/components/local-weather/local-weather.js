@@ -364,7 +364,7 @@ customElements.define('local-weather',
       const latestForecasts = weatherData.filter(data => new Date(data.validTime.substring(0, 19)).getTime() < now)
       const mappedData = [latestForecasts.pop()].map(data => ({
         time: data.validTime.substring(0, 19),
-        temp: data.parameters[11].values[0],
+        temp: data.parameters[10].values[0],
         windAngle: data.parameters[13].values[0],
         windSpeed: data.parameters[14].values[0],
         rain: data.parameters[3].values[0],
